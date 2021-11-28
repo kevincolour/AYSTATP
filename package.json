@@ -30,6 +30,7 @@
     "react-native-extended-stylesheet": "git+https://github.com/bberak/react-native-extended-stylesheet.git",
     "react-native-game-engine": "^1.1.0",
     "react-native-gesture-handler": "~1.10.2",
+    "react-native-grid-component": "^2.0.1",
     "react-native-reanimated": "~2.2.0",
     "react-native-safe-area-context": "3.2.0",
     "react-native-screens": "~3.4.0",
