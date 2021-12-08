@@ -18,7 +18,7 @@ export default class SingleTouch extends Component {
     let move = touches.find(x => x.type === "move");
     if (move) {
       this.setState({
-        x: this.state.x + move.delta.pageX,
+        x: Math.max(0,this.state.x + move.delta.pageX),
         y: this.state.y + move.delta.pageY
       });
     }

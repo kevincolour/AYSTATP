@@ -1,7 +1,7 @@
 import { StyleSheet, View ,Dimensions} from 'react-native';
 import React, { Component } from 'react';
 import Grid from 'react-native-grid-component';
- 
+import Animated from "react-native-reanimated";
 const size = 16;
 const length = Math.sqrt(size);
 const padding = 10;
@@ -9,9 +9,10 @@ const { width: WIDTH, height: HEIGHT} = Dimensions.get("window");
 
 const heightAdjusted = HEIGHT - 200;
 
-class Simple extends Component {
+class SimpleGrid extends Component {
 
-  
+  // length = props.length;
+  // size = length * 2;
   _renderItem = (data, i) => (
     <View style={[{ backgroundColor: data }, styles.item]} key={i} />
   );
@@ -51,6 +52,23 @@ const styles = StyleSheet.create({
   }
 });
 
+const Box = (props) => {
+
+
+  return (
+    <Animated.View
+      style={{
+        position: "absolute",
+        left: 1,
+        top: 2,
+        width: 50,
+        height: 50,
+        transform: [{ rotate: 10 + "rad" }],
+        backgroundColor: props.color || "pink",
+      }}
+    />
+  );
+};
 
 
 
@@ -58,4 +76,7 @@ const styles = StyleSheet.create({
 
 
 
-export { Simple };
+
+
+
+export { SimpleGrid,Box};

@@ -42,6 +42,7 @@ const CreateBox = (state, { touches, screen }) => {
 const MoveBox = (state, { touches }) => {
 	let constraint = state["physics"].constraint;
 
+	
 	//-- Handle start touch
 	let start = touches.find(x => x.type === "start");
 
@@ -84,6 +85,51 @@ const MoveBox = (state, { touches }) => {
 	return state;
 };
 
+const MovePlayer = (state, { touches }) => {
+	let constraint = state["physics"].constraint;
+	//-- Handle start touch
+	let start = touches.find(x => x.type === "start");
+	let startPos = null;
+	if (start) {
+		startPos = [start.event.pageX, start.event.pageY];
+
+		let boxId = Object.keys(state).find(key => {
+			let body = state[key].body;
+			if (body){
+			}
+			return (
+				body &&
+				distance([body.position.x, body.position.y], startPos) < 25
+			);
+		});
+
+		if (boxId) {
+			constraint.pointA = { x: startPos[0], y: startPos[1] };
+			constraint.bodyB = state[boxId].body;
+			constraint.pointB = { x: 0, y: 0 }; 
+			constraint.angleB = state[boxId].body.angle;
+		}
+	}
+
+	//-- Handle move touch
+	let move = touches.find(x => x.type === "move");
+
+	if (move) {
+		constraint.pointA = { x: move.event.pageX, y: move.event.pageY };
+	}
+
+	//-- Handle end touch
+	let end = touches.find(x => x.type === "end");
+
+	if (end) {
+		constraint.pointA = null;
+		constraint.bodyB = null;
+		constraint.pointB = null;
+	}
+
+	return state;
+};
+
 const CleanBoxes = (state, { touches, screen }) => {
 	let world = state["physics"].world;
 
@@ -97,4 +143,4 @@ const CleanBoxes = (state, { touches, screen }) => {
 	return state;
 };
 
-export { Physics, CreateBox, MoveBox, CleanBoxes };
+export { Physics, CreateBox, MoveBox, CleanBoxes , MovePlayer};

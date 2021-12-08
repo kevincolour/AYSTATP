@@ -100,12 +100,7 @@ export default class TableOfContents extends Component {
           ref={"engine"}
           running={!this.props.sceneVisible}
           systems={[
-            SpawnParticles,
-            Gravity,
-            Wind,
-            Sprinkles,
-            Motion,
-            DegenerateParticles
+
           ]}
           entities={{
             "particle-system-01": {
