@@ -5,7 +5,7 @@ import {SimpleGrid} from "./renderers"
 import Matter from "matter-js";
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
-const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.085)-50;
+const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
 const BORDER_WIDTH = Math.trunc(BODY_DIAMETER * 0.1);
 const COLORS = ["#86E9BE", "#8DE986", "#B8E986", "#E9E986"];
 const BORDER_COLORS = ["#C0F3DD", "#C4F6C0", "#E5FCCD", "#FCFDC1"];
@@ -63,17 +63,86 @@ export default class Worm extends PureComponent {
 			return (Math.abs(curr - goalY) < Math.abs(prev - goalY) ? curr : prev);
 		});
 	
-	console.log(goalY)
-		// const x = this.props.x - BODY_DIAMETER / 2 ;
 		const x = closestX;
 		const y = closestY;
 
+		console.log(JSON.stringify(this.props.movement));
+		
+		let newLocation = false;
+		let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
+		let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
+
+
+		//new x coord
+		 if (lastKnownX != x || lastKnownY != y){
+			//track last known 
+			let newCoordArray = [x,y];
+			this.props.trackMovementFunc(newCoordArray);
+		}
+
+		
+
+
+		//populate the path taken so far in a list of views
+		const viewPath = [];
+		let index = 1; 
+		if (this.props.movement.length > 0){
+			while (index < this.props.movement.length){
+				let path = this.props.movement[index];
+				let prevPath = this.props.movement[index-1];
+				let horizontalDifference = path[0] - prevPath[0] ;
+				let verticalDifference = path[1] -prevPath[1];
+				let pathStyle = {
+					
+					position: "absolute", left: path[0], top: path[1], backgroundColor: "blue" 
+				}
+				//I went up. 
+				if (verticalDifference < 0){
+					pathStyle.width = padding;
+					pathStyle.height = Math.abs(verticalDifference);
+				}
+				
+				//I went down
+				else if (verticalDifference > 0){
+					pathStyle.width = padding;
+					pathStyle.height = Math.abs(verticalDifference) + padding;
+					pathStyle.top = prevPath[1];
+				}
+				//I went left
+				else if (horizontalDifference < 0){
+					pathStyle.height = padding;
+					pathStyle.width = Math.abs(horizontalDifference);
+				}
+				//I went right
+				else if (horizontalDifference > 0){
+					pathStyle.height = padding;
+					pathStyle.width = Math.abs(horizontalDifference) + padding;
+					pathStyle.left = prevPath[0];
+				}
+
+				// if (horizontalDifference != 0){
+				// 	pathStyle.width = horizontalDifference;
+				// 	pathStyle.height = padding;
+				// }
+				// else{
+				// 	pathStyle.width = padding;
+				// 	pathStyle.height = verticalDifference;
+				// }
+
+				viewPath.push(<View style = {pathStyle} key={index}></View>);
+				index++;
+			}
+		}
 		return (
 			<>
 			        {gridLocations.map((ele,index) =>
             <View onResponderMove={this.handlePressIn}
-			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, height:ele.height, backgroundColor: "red", borderBottomWidth: 10}} key={index}></View>
+			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
+			height:ele.height, backgroundColor: "red", 
+			borderWidth: 0}} key={index}></View>
         )}
+		{viewPath}
+		  {/* <View style = {{position: "absolute", left: lastKnownX, top: lastKnownY, width:200, height:200, backgroundColor: "blue" }}></View> */}
 			<View>
 
 
