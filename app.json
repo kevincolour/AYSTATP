@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "React Native Game Engine - Handbook",
-    "description": "A React Native app showcasing some examples using the lightweight https://github.com/bberak/react-native-game-engine library.",
-    "slug": "react-native-game-engine-handbook",
+    "name": "AYSTATP",
+    "description": "Are you smarter than a tetris piece?",
+    "slug": "AYSTATP",
     "privacy": "public",
     "platforms": [
       "ios",
@@ -11,9 +11,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#E96443",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/iconPlaceholder.png",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/splashPlaceholder.png",
       "resizeMode": "contain",
       "backgroundColor": "#904E95"
     },

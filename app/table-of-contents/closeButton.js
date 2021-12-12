@@ -3,7 +3,6 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import * as Animatable from "react-native-animatable";
 import EStyleSheet from "react-native-extended-stylesheet";
 import Close from "./images/close.png";
-import Forward from "./images/forward.png";
 
 export default class CloseButton extends Component {
   constructor(props) {

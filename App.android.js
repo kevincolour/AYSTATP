@@ -84,7 +84,6 @@ export default class App extends Component {
   };
 
   nextLevelLoad = () =>{
-    console.log("nextLevel!")
     let newLevel = this.state.currentLevelIndex + 1;
     let newLevelComponent = <SingleTouch key = {newLevel} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
     this.setState({
@@ -115,11 +114,11 @@ export default class App extends Component {
               },
               {
                 heading: "Levels",
-                onPress: _ => this.mountScene(<SingleTouch />)
+                // onPress: _ => this.mountScene(<SingleTouch />)
               },
               {
                 heading: "Help",
-                onPress: _ => this.mountScene(<SingleTouch />)
+                // onPress: _ => this.mountScene(<SingleTouch />)
               },
               
             ]
