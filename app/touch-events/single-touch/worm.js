@@ -26,12 +26,6 @@ export default class Worm extends Component {
 
 	createGrid(state){
 
-		//TODO
-		//move grid locatoins outside 
-		//level consideration
-		//decouple worm and grid
-
-
 		//array of xstart,xend,ystart,yend
 		const gridLocations = [];
 
@@ -97,10 +91,6 @@ export default class Worm extends Component {
 			return (Math.abs(curr - yVal) < Math.abs(prev - yVal) ? curr : prev);
 		});
 	
-
-		// console.log(JSON.stringify(this.props.movement));
-		
-		let newLocation = false;
 		let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
 		let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
 
@@ -166,7 +156,6 @@ export default class Worm extends Component {
 
 			<Pressable
 				onPress={() => {
-					console.log(this.props);
 					this.props.loadNext();
 				}}
 				style={({ pressed }) => [
@@ -184,17 +173,26 @@ export default class Worm extends Component {
 				)}
       		</Pressable>
 			</View>)}
-			        {this.state.gridLocations.map((ele,index) =>
+		{this.state.gridLocations.map((ele,index) =>
             <View 
 			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
-			height:ele.height, backgroundColor: "grey", 
-			borderWidth: 0 ,borderRadius: 5}} key={index}></View>
+			height:ele.height, backgroundColor: "grey", justifyContent: "center", alignItems: "center",
+			borderWidth: 0 ,borderRadius: 5}} key={index}>
+				{this.props.level.tetrisPieces.some((ele) => ele.location.index == index)  && 
+					
+					<Image style ={{position: "absolute",left: 0, top: 0, width: ele.width,
+			height:ele.height, 
+			borderWidth: 0}} source={require('./Tetris/TetrisPiece1.png')} />
+			
+				}
+
+			</View>
         )}
 		{viewPath}
 		<View >
 		<Image style ={{position: "absolute",left: WIDTH - 40, top: 0, width: 40,
 			height:40, 
-			borderWidth: 0}}
+			borderWidth: 0, justifyContent: "center", alignItems: "center"}}
         
         source={{
           uri: 'https://www.seekpng.com/png/detail/24-243121_apple-png-apple-clipart.png',

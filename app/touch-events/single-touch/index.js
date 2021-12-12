@@ -65,7 +65,7 @@ export default class SingleTouch extends Component {
     }
     else{
           //patch : check if path needs to be filled in 
-          if (this.state.movement.length > 1){
+          if (this.state.movement.length > 0){
 
             let lastLocation = this.state.movement[this.state.movement.length - 1];
             if ( (lastLocation[0] != val[0] && lastLocation[1] != val[1])){

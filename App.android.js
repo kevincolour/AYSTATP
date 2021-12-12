@@ -31,12 +31,16 @@ const level1 = {
   name: "level1",
   size : 4,
   tetrisPieces : [{
+    style: {
+      width: 100, height:100, backgroundColor: "yellow"
+    },
     location:
     {
       x:1,
-      y:1
+      y:1,
+      index: 10
     },
-    verticalCount :0,
+    verticalCount :2,
     horizontalCount : 0
   }]
 }
@@ -63,7 +67,7 @@ export default class App extends Component {
 
     super(props);
     this.state = {
-      currentLevelIndex: 0,
+      currentLevelIndex: 1,
       sceneVisible: false,
       scene: null
     };
