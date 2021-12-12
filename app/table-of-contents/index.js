@@ -28,6 +28,7 @@ export default class TableOfContents extends Component {
   }
 
   onItemPress = async data => {
+    console.log(data);
     if (data.items) {
       let refs = [this.state.heading, "back"].concat(
         this.state.items.map(x => x.heading)
@@ -96,19 +97,7 @@ export default class TableOfContents extends Component {
         style={css.linearGradient}
       >
 
-        <GameEngine
-          ref={"engine"}
-          running={!this.props.sceneVisible}
-          systems={[
-
-          ]}
-          entities={{
-            "particle-system-01": {
-              particles: [],
-              renderer: ParticleSystem
-            }
-          }}
-        >
+    
           <StatusBar hidden={false} barStyle={"light-content"} />
 
           <ScrollView contentContainerStyle={css.container}>
@@ -147,7 +136,6 @@ export default class TableOfContents extends Component {
 
           </ScrollView>
 
-        </GameEngine>
 
       </LinearGradient>
     );

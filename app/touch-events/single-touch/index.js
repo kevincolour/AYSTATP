@@ -19,7 +19,8 @@ export default class SingleTouch extends Component {
     this.state = {
       x: 0,
       y: this.yStart,
-      movement: []
+      movement: [],
+      victory: false
     };
   }
 
@@ -38,26 +39,16 @@ export default class SingleTouch extends Component {
 
   }
 
-  loadNext = () => {
-    
-  }
-
   trackMovement = (val) => {
     //val is an intersection, can't touch intersection more than once
 
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
 
-
+    console.log(JSON.stringify(this.state.movement));
     //check if snake dies
     
     let alreadyTraversedVal = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
-
-
-    //check if player reached the "end"
-    if (val[0] >= WIDTH- 50 && 0 == val[1]){
-      this.props.triggerVictory();
-    }
 
 		//check if player reversed route ! 
 
@@ -86,7 +77,7 @@ export default class SingleTouch extends Component {
 
         <StatusBar hidden={true} />
 
-        <Worm {...this.state} level = {this.props.level} trackMovementFunc={this.trackMovement}/>
+        <Worm key={this.props.level.name} {...this.state} loadNext = {this.props.loadNext} level = {this.props.level} trackMovementFunc={this.trackMovement}/>
         {this.doneLevel ? <NextButton onPress={this.loadNext} /> : null}
         
 

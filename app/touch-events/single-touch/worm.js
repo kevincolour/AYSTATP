@@ -1,5 +1,5 @@
 import React, { PureComponent,Component } from "react";
-import { StyleSheet, View, Dimensions ,Image} from "react-native";
+import { StyleSheet, View, Dimensions ,Image, Text,Pressable	} from "react-native";
 import { StaggeredMotion, spring } from "react-motion";
 import {SimpleGrid} from "./renderers"
 import Matter from "matter-js";
@@ -12,7 +12,7 @@ const BORDER_COLORS = ["#C0F3DD", "#C4F6C0", "#E5FCCD", "#FCFDC1"];
 
 const padding = 20;
 
-export default class Worm extends PureComponent {
+export default class Worm extends Component {
 
 	constructor(props) {
 		super(props);
@@ -21,10 +21,7 @@ export default class Worm extends PureComponent {
 			validPaths : [],
 		}
 		this.createGrid(this.state);
-		console.log("initialized GRid.");
-	}
-	componentDidMount(){
-		// 
+		console.log("initialized Grid.");
 	}
 
 	createGrid(state){
@@ -41,9 +38,6 @@ export default class Worm extends PureComponent {
 		const n = this.props.level.size;
 		const validPaths = [];
 		validPaths.push(0)
-
-
-
 
 		let xPointer = padding;
 
@@ -98,30 +92,30 @@ export default class Worm extends PureComponent {
 		var closestX = this.state.validPaths.reduce(function(prev, curr) {
 			return (Math.abs(curr - xVal) < Math.abs(prev - xVal) ? curr : prev);
 			});
-	
-			var closestY = this.state.validPaths.reduce(function(prev, curr) {
-				return (Math.abs(curr - yVal) < Math.abs(prev - yVal) ? curr : prev);
-			});
-		
-	
-			// console.log(JSON.stringify(this.props.movement));
-			
-			let newLocation = false;
-			let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
-			let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
-	
-	
-			//new x coord
-			 if (lastKnownX != closestX || lastKnownY != closestY){
-				//track last known 
-				let newCoordArray = [closestX,closestY];
-				this.props.trackMovementFunc(newCoordArray);
-			}
-	
-		
 
-		
+		var closestY = this.state.validPaths.reduce(function(prev, curr) {
+			return (Math.abs(curr - yVal) < Math.abs(prev - yVal) ? curr : prev);
+		});
+	
 
+		// console.log(JSON.stringify(this.props.movement));
+		
+		let newLocation = false;
+		let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
+		let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
+
+		let renderVictory = false;
+    //check if player reached the "end"
+  	  if (closestX >= WIDTH- padding && 0 == closestY){
+		renderVictory = true;
+	  }
+
+		//new x coord
+			if (lastKnownX != closestX || lastKnownY != closestY){
+			//track last known 
+			let newCoordArray = [closestX,closestY];
+			this.props.trackMovementFunc(newCoordArray);
+		}
 
 		//populate the path taken so far in a list of views
 		const viewPath = [];
@@ -168,6 +162,28 @@ export default class Worm extends PureComponent {
 		}
 		return (
 			<>
+			{(renderVictory && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
+
+			<Pressable
+				onPress={() => {
+					console.log(this.props);
+					this.props.loadNext();
+				}}
+				style={({ pressed }) => [
+				{
+					backgroundColor: pressed
+					? 'rgb(210, 230, 255)'
+					: 'white'
+				},
+				styles.wrapperCustom
+				]}>
+				{({ pressed }) => (
+				<Text style={styles.text}>
+					{pressed ? 'Pressed!' : 'Press Me'}
+				</Text>
+				)}
+      		</Pressable>
+			</View>)}
 			        {this.state.gridLocations.map((ele,index) =>
             <View 
 			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
@@ -244,6 +260,28 @@ export default class Worm extends PureComponent {
 		);
 	}
 }
+
+
+const styles = StyleSheet.create({
+	container: {
+	  flex: 1,
+	  justifyContent: "center",
+	},
+	text: {
+	  fontSize: 16
+	},
+	wrapperCustom: {
+	  borderRadius: 8,
+	  padding: 6
+	},
+	logBox: {
+	  padding: 20,
+	  margin: 10,
+	  borderWidth: StyleSheet.hairlineWidth,
+	  borderColor: '#f0f0f0',
+	  backgroundColor: '#f9f9f9'
+	}
+  });
 
 const css = StyleSheet.create({
 	body: {

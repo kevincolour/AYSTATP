@@ -14,6 +14,7 @@ console.disableYellowBox = true;
 
 
 const levelPrologue = {
+  name: "levelPrologue",
   size : 1,
   tetrisPieces : [{
     location:
@@ -27,6 +28,7 @@ const levelPrologue = {
 }
 
 const level1 = {
+  name: "level1",
   size : 4,
   tetrisPieces : [{
     location:
@@ -38,7 +40,22 @@ const level1 = {
     horizontalCount : 0
   }]
 }
-const levels = [levelPrologue,level1];
+
+const level2 = {
+  name: "level2",
+  size : 3,
+  tetrisPieces : [{
+    location:
+    {
+      x:1,
+      y:1
+    },
+    verticalCount :0,
+    horizontalCount : 0
+  }]
+}
+
+const levels = [levelPrologue,level1,level2];
 
 
 export default class App extends Component {
@@ -46,8 +63,7 @@ export default class App extends Component {
 
     super(props);
     this.state = {
-      currentLevelIndex: 1,
-      victory: false,
+      currentLevelIndex: 0,
       sceneVisible: false,
       scene: null
     };
@@ -68,14 +84,22 @@ export default class App extends Component {
   };
 
   nextLevelLoad = () =>{
-
-  }
-
-  triggerVictory = () =>{
+    console.log("nextLevel!")
+    let newLevel = this.state.currentLevelIndex + 1;
+    let newLevelComponent = <SingleTouch key = {newLevel} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
     this.setState({
-      victory: true
-    });
+      sceneVisible:true,
+      scene: newLevelComponent,
+      currentLevelIndex: newLevel
+    })
+
   }
+
+  // triggerVictory = () =>{
+  //   this.setState({
+  //     victory: true
+  //   });
+  // }
   render() {  
     return (
       
@@ -87,7 +111,7 @@ export default class App extends Component {
             items: [
               {
                 heading: "Play",
-                onPress: _ => this.mountScene(<SingleTouch level = {levels[this.state.currentLevelIndex]} triggerVictory = {this.triggerVictory}/>)
+                onPress: _ => this.mountScene(<SingleTouch loadNext = {this.nextLevelLoad} level = {levels[this.state.currentLevelIndex]} triggerVictory = {this.triggerVictory}/>)
               },
               {
                 heading: "Levels",
