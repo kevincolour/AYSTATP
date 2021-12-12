@@ -45,7 +45,6 @@ export default class SingleTouch extends Component {
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
 
-    console.log(JSON.stringify(this.state.movement));
     //check if snake dies
     
     let alreadyTraversedVal = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
@@ -55,6 +54,8 @@ export default class SingleTouch extends Component {
 		if (previousX == val[0] && previousY == val[1]){
 				this.state.movement.pop();
 		}
+
+
     else if(alreadyTraversedVal){
           this.setState ({
             x: 0,
@@ -63,9 +64,21 @@ export default class SingleTouch extends Component {
           })
     }
     else{
+          //patch : check if path needs to be filled in 
+          if (this.state.movement.length > 1){
+
+            let lastLocation = this.state.movement[this.state.movement.length - 1];
+            if ( (lastLocation[0] != val[0] && lastLocation[1] != val[1])){
+              //both x and y do not match previous means that there was a diagonal direction move
+              //assume player went bottom, then up - have to fill in the bottom
+              let bottomMovement = [val[0], lastLocation[1]];
+              this.state.movement.push(bottomMovement);
+            }
+          }
       this.state.movement.push(val);
 
     }
+    console.log(JSON.stringify(this.state.movement));
 
   }
 
