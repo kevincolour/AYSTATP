@@ -4,11 +4,6 @@ import CloseButton from "./app/table-of-contents/closeButton";
 import EStyleSheet from "react-native-extended-stylesheet";
 
 import TableOfContents from "./app/table-of-contents";
-import TouchChapter from "./app/touch-events";
-import PhysicsChapter from "./app/physics";
-////import SensorsChapter from "./app/sensors";
-import ExamplesChapter from "./app/examples";
-import OpenGLChapter from "./app/opengl";
 import SingleTouch from "./app/touch-events/single-touch";
 EStyleSheet.build();
 
@@ -16,10 +11,43 @@ EStyleSheet.build();
 //-- by dependencies. Comment out the line below to see the warnings.
 console.disableYellowBox = true;
 
+
+
+const levelPrologue = {
+  size : 1,
+  tetrisPieces : [{
+    location:
+    {
+      x:1,
+      y:1
+    },
+    verticalCount :0,
+    horizontalCount : 0
+  }]
+}
+
+const level1 = {
+  size : 4,
+  tetrisPieces : [{
+    location:
+    {
+      x:1,
+      y:1
+    },
+    verticalCount :0,
+    horizontalCount : 0
+  }]
+}
+const levels = [levelPrologue,level1];
+
+
 export default class App extends Component {
   constructor(props) {
+
     super(props);
     this.state = {
+      currentLevelIndex: 1,
+      victory: false,
       sceneVisible: false,
       scene: null
     };
@@ -39,23 +67,37 @@ export default class App extends Component {
     });
   };
 
-  render() {
+  nextLevelLoad = () =>{
+
+  }
+
+  triggerVictory = () =>{
+    this.setState({
+      victory: true
+    });
+  }
+  render() {  
     return (
       
       <View style={{ flex: 1 }}>
         <TableOfContents
           sceneVisible={this.state.sceneVisible}
           contents={{
-            heading: "Chapters",
+            heading: "AYSTATP",
             items: [
               {
-                heading: "Single Touch",
+                heading: "Play",
+                onPress: _ => this.mountScene(<SingleTouch level = {levels[this.state.currentLevelIndex]} triggerVictory = {this.triggerVictory}/>)
+              },
+              {
+                heading: "Levels",
                 onPress: _ => this.mountScene(<SingleTouch />)
               },
-              PhysicsChapter(this.mountScene),
-              ////SensorsChapter(this.mountScene),
-              // OpenGLChapter(this.mountScene),
-              // ExamplesChapter(this.mountScene)
+              {
+                heading: "Help",
+                onPress: _ => this.mountScene(<SingleTouch />)
+              },
+              
             ]
           }}
         />

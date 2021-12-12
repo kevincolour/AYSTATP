@@ -1,11 +1,11 @@
 import React, { Component } from "react";
-import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity, Text } from "react-native";
 import * as Animatable from "react-native-animatable";
 import EStyleSheet from "react-native-extended-stylesheet";
-import Close from "./images/close.png";
-import Forward from "./images/forward.png";
+import Forward from "../../table-of-contents/images/logo.png";
+import Close from "../../table-of-contents/images/close.png";
 
-export default class CloseButton extends Component {
+export default class NextButton extends Component {
   constructor(props) {
     super(props);
     this.state = {};
@@ -20,19 +20,25 @@ export default class CloseButton extends Component {
 
   render() {
     return (
+      <>
+        
       <TouchableOpacity
         style={css.button}
         hitSlop={{top: 10, left: 10, bottom: 10, right: 10}}
         activeOpacity={1}
         onPress={this.onPress}
       >
-        <Animatable.Image
-          ref={"close"}
+        {/* <Animatable.Image
+          ref={"forward"}
           delay={500}
           animation={"bounceIn"}
-          source={Close}
-        />
+          source={Forward}
+        /> */}
+        <Text>
+          Success
+        </Text>
       </TouchableOpacity>
+      </>
     );
   }
 }
@@ -41,6 +47,7 @@ const css = EStyleSheet.create({
   $marginTop: "1.5%",
   button: {
     top:500,
+    left: 200,
     margin: "$marginTop",
     position: "absolute"
   }

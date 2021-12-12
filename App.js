@@ -46,13 +46,9 @@ export default class App extends Component {
         <TableOfContents
           sceneVisible={this.state.sceneVisible}
           contents={{
-            heading: "Chapters",
+            heading: "AYSTATP",
             items: [
               TouchChapter(this.mountScene),
-              PhysicsChapter(this.mountScene),
-              ////SensorsChapter(this.mountScene),
-              OpenGLChapter(this.mountScene),
-              ExamplesChapter(this.mountScene)
             ]
           }}
         />

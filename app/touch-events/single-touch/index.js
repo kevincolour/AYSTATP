@@ -1,17 +1,24 @@
 import React, { Component } from "react";
-import { StyleSheet, Dimensions, StatusBar } from "react-native";
+import { StyleSheet, Dimensions, StatusBar,Text, Button } from "react-native";
 import { GameLoop } from "react-native-game-engine";
 import Worm from "./worm";
+import NextButton from "./nextButton";
+
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
+//tetris piece has location, 
 
+
+
+const padding = 20;
 export default class SingleTouch extends Component {
-  constructor() {
-    super();
+  constructor(props) {
+    super(props);
+    this.yStart = WIDTH - padding;
     this.state = {
-      x: WIDTH / 2,
-      y: HEIGHT / 2,
+      x: 0,
+      y: this.yStart,
       movement: []
     };
   }
@@ -19,12 +26,22 @@ export default class SingleTouch extends Component {
   onUpdate = ({ touches }) => {
     let move = touches.find(x => x.type === "move");
     if (move) {
+
       this.setState({
-        x: Math.max(0,this.state.x + move.delta.pageX),
-        y: this.state.y + move.delta.pageY
+        x: Math.min(WIDTH,Math.max(0,this.state.x + move.delta.pageX)),
+        y: Math.min(HEIGHT,Math.max(0,this.state.y + move.delta.pageY))
       });
     }
   };
+
+  evaluateRoute = () => {
+
+  }
+
+  loadNext = () => {
+    
+  }
+
   trackMovement = (val) => {
     //val is an intersection, can't touch intersection more than once
 
@@ -32,11 +49,28 @@ export default class SingleTouch extends Component {
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
 
 
+    //check if snake dies
+    
+    let alreadyTraversedVal = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
+
+
+    //check if player reached the "end"
+    if (val[0] >= WIDTH- 50 && 0 == val[1]){
+      this.props.triggerVictory();
+    }
+
 		//check if player reversed route ! 
 
 		if (previousX == val[0] && previousY == val[1]){
 				this.state.movement.pop();
 		}
+    else if(alreadyTraversedVal){
+          this.setState ({
+            x: 0,
+            y: this.yStart,
+            movement: []
+          })
+    }
     else{
       this.state.movement.push(val);
 
@@ -44,13 +78,17 @@ export default class SingleTouch extends Component {
 
   }
 
+ 
+
   render() {
     return (
       <GameLoop style={styles.container} onUpdate={this.onUpdate}>
 
         <StatusBar hidden={true} />
 
-        <Worm {...this.state} trackMovementFunc={this.trackMovement}/>
+        <Worm {...this.state} level = {this.props.level} trackMovementFunc={this.trackMovement}/>
+        {this.doneLevel ? <NextButton onPress={this.loadNext} /> : null}
+        
 
       </GameLoop>
     );
