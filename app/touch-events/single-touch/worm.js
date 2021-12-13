@@ -10,29 +10,136 @@ const BORDER_WIDTH = Math.trunc(BODY_DIAMETER * 0.1);
 const COLORS = ["#86E9BE", "#8DE986", "#B8E986", "#E9E986"];
 const BORDER_COLORS = ["#C0F3DD", "#C4F6C0", "#E5FCCD", "#FCFDC1"];
 
-const padding = 20;
 
 export default class Worm extends Component {
 
 	constructor(props) {
 		super(props);
+		//crazy math to figure out the width while adjusting for padding
+		const padding = 20;
+		const n = this.props.level.size;
+		const width = (WIDTH- (padding*(n+1))) / n;
+		
 		this.state = {
 			gridLocations : [],
 			validPaths : [],
+			renderComplete: false,
+			width: width,
+			padding : padding,
 		}
 		this.createGrid(this.state);
 		console.log("initialized Grid.");
 	}
+
+	//need to move this up to index.js , as well as creategrid();
+	evaluateRoute = () => {
+		//triggers when player reaches the end 
+	
+		//evaluate if tetris rules are met 
+	
+		//check every possible grid spot as a starting location for tetris rule to evaluate
+		  // from each grid spot, try navigating to each spot, start at top of the tetris piece
+		
+		this.props.level.tetrisPieces.forEach((ele,ind) =>{
+			this.checkTetrisConstraint(ele);
+		})
+	
+	}
+
+	checkConstraintDirection = (direction, tetrisPiece) => {
+		let currentBox = this.state.gridLocations[tetrisPiece.location.index];
+		let yCoordOfPath = 0;
+		let xCoordOfPath = 0;
+		let needToRecurse = false; 
+		let xCoordOfPathEnd = 0;
+		let yCoordOfPathEnd = 0;
+		let hitEdge  = currentBox.y - this.state.width < 0 ;
+
+		switch (direction){
+			case "up":
+				needToRecurse = tetrisPiece.childUp;
+				xCoordOfPath = currentBox.x - this.state.padding;
+			    yCoordOfPath = currentBox.y - this.state.padding;
+				yCoordOfPathEnd = yCoordOfPath;
+				xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
+				hitEdge  = currentBox.y - this.state.width < 0 ;
+				break;
+			case "left":
+				needToRecurse = tetrisPiece.childLeft;
+				xCoordOfPath = currentBox.x - this.state.padding;
+			    yCoordOfPath = currentBox.y - this.state.padding;
+				yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
+				xCoordOfPathEnd = xCoordOfPath; 
+				hitEdge  = currentBox.x - this.state.width < 0 ;
+				break;
+			case "right":
+				needToRecurse = tetrisPiece.childLeft;
+				xCoordOfPath = currentBox.x + this.state.width;
+			    yCoordOfPath = currentBox.y - this.state.padding;
+				yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
+				xCoordOfPathEnd = xCoordOfPath; 
+				hitEdge  = currentBox.x + this.state.width > WIDTH ;
+				break;
+			case "down":
+				needToRecurse = tetrisPiece.childDown;
+				xCoordOfPath = currentBox.x - this.state.padding;
+			    yCoordOfPath = currentBox.y + this.state.width;
+				yCoordOfPathEnd = yCoordOfPath;
+				xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
+				hitEdge  = currentBox.y + this.state.width > WIDTH ;
+				break;
+		}
+		// console.log(xCoordOfPath,yCoordOfPath );
+		// console.log(xCoordOfPathEnd, yCoordOfPathEnd);
+		// console.log({hitEdge})
+
+		if (needToRecurse){
+			//recurse upwards
+		}
+		else{
+			//need to be either the border, or the edge of screen
+			if (!(hitEdge || (this.props.movement.slice(0,this.props.movement.length - 1).some(
+				(ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
+			 (this.props.movement[index + 1][0] ==  xCoordOfPathEnd && this.props.movement[index + 1][1] ==  yCoordOfPathEnd 
+			  || 
+			 this.props.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.props.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd
+			  
+			  )
+			 ) 
+			)))
+			{
+				//one of the conditions above was true, puzzle failed
+				console.log(direction + " failed");
+					return false;
+			}
+			else{
+				console.log("made it");
+			}
+			
+		}
+	}
+
+	checkTetrisConstraint = (tetrisPiece) =>{
+	
+		this.checkConstraintDirection("up",tetrisPiece);
+		this.checkConstraintDirection("left",tetrisPiece);
+		this.checkConstraintDirection("right",tetrisPiece);
+		this.checkConstraintDirection("down",tetrisPiece);
+
+   }
+
+
+	
 
 	createGrid(state){
 
 		//array of xstart,xend,ystart,yend
 		const gridLocations = [];
 
-		const n = this.props.level.size;
+	
 		const validPaths = [];
 		validPaths.push(0)
-
+		const padding = this.state.padding;
 		let xPointer = padding;
 
 
@@ -40,27 +147,22 @@ export default class Worm extends Component {
 		// let topOffset = HEIGHT/ 2 - WIDTH /2;
 		let yPointer = padding ;
 
-		//crazy math to figure out the width while adjusting for padding
-		const width = (WIDTH- (padding*(n+1))) / n;
-
-		
-
-		for (let i = 0; i < n; i++){
+		for (let i = 0; i < this.props.level.size; i++){
 			//row reset
 			xPointer = padding;
-			for (let j = 0; j < n; j++){
+			for (let j = 0; j < this.props.level.size; j++){
 				let newGrid = {};
 				newGrid.x = xPointer;
 				newGrid.y = yPointer;
-				newGrid.width = width;
-				newGrid.height = width;
+				newGrid.width = this.state.width;
+				newGrid.height = this.state.width;
 				gridLocations.push(newGrid);
 
-				xPointer += width + padding;
+				xPointer += this.state.width + padding;
 			}
 			
-			validPaths.push(yPointer + width);
-			yPointer += width + padding;
+			validPaths.push(yPointer + this.state.width);
+			yPointer += this.state.width + padding;
 		}
 		state.validPaths = validPaths;
 
@@ -70,7 +172,7 @@ export default class Worm extends Component {
 	}
 
 	render() {
-
+		const padding = this.state.padding;
 // var closestXY = validPaths.reduce(function(prev, curr) {
 		// 	var a = Math.hypot(prev[0]-goalX, prev[1]-goalY);
 		// 	var b = Math.hypot(curr[0]-goalX, curr[1]-goalY);
@@ -94,10 +196,10 @@ export default class Worm extends Component {
 		let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
 		let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
 
-		let renderVictory = false;
     //check if player reached the "end"
   	  if (closestX >= WIDTH- padding && 0 == closestY){
-		renderVictory = true;
+		this.state.renderComplete = true;
+		this.evaluateRoute();
 	  }
 
 		//new x coord
@@ -150,9 +252,31 @@ export default class Worm extends Component {
 				index++;
 			}
 		}
+
+		const gridWithPieces = [];
+		const gameObj = this;
+		this.state.gridLocations.forEach(function(ele,ind){
+			let associatedTetrisPiece = gameObj.props.level.tetrisPieces.find((ele) => ele.location.index == ind)
+			let square =             <View 
+			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
+			height:ele.height, backgroundColor: "grey", justifyContent: "center", alignItems: "center",
+			borderWidth: 0 ,borderRadius: 5}} key={ind}>
+	
+		{associatedTetrisPiece  && 
+					<Image style ={{position: "absolute",left: 0, top: 0, width: ele.width,
+			height:ele.height, 
+			borderWidth: 0}} source={associatedTetrisPiece.img} />
+			
+				} 
+			</View>;
+
+
+			gridWithPieces.push(square);
+		})
+
 		return (
 			<>
-			{(renderVictory && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
+			{(this.state.renderComplete && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
 
 			<Pressable
 				onPress={() => {
@@ -173,22 +297,9 @@ export default class Worm extends Component {
 				)}
       		</Pressable>
 			</View>)}
-		{this.state.gridLocations.map((ele,index) =>
-            <View 
-			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
-			height:ele.height, backgroundColor: "grey", justifyContent: "center", alignItems: "center",
-			borderWidth: 0 ,borderRadius: 5}} key={index}>
-				{this.props.level.tetrisPieces.some((ele) => ele.location.index == index)  && 
-					
-					<Image style ={{position: "absolute",left: 0, top: 0, width: ele.width,
-			height:ele.height, 
-			borderWidth: 0}} source={require('./Tetris/TetrisPiece1.png')} />
-			
-				}
+			{gridWithPieces}
 
-			</View>
-        )}
-		{viewPath}
+			{viewPath}
 		<View >
 		<Image style ={{position: "absolute",left: WIDTH - 40, top: 0, width: 40,
 			height:40, 

@@ -9,6 +9,8 @@ const { width: WIDTH, height: HEIGHT} = Dimensions.get("window");
 
 const heightAdjusted = HEIGHT - 200;
 
+
+
 class SimpleGrid extends Component {
 
   // length = props.length;
@@ -24,6 +26,7 @@ class SimpleGrid extends Component {
       () => "orange"
     );
   }
+
 
 
   render() {

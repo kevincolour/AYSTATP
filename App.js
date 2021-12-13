@@ -5,11 +5,7 @@ import EStyleSheet from "react-native-extended-stylesheet";
 
 import TableOfContents from "./app/table-of-contents";
 import TouchChapter from "./app/touch-events";
-import PhysicsChapter from "./app/physics";
-////import SensorsChapter from "./app/sensors";
-import ExamplesChapter from "./app/examples";
-import OpenGLChapter from "./app/opengl";
-import SingleTouch from "./app/touch-events/single-touch";
+
 EStyleSheet.build();
 
 //-- There is a bunch of warnings about the use of deprecated lifecycle methods. A lot of them are caused

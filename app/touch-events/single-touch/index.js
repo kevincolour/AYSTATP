@@ -3,7 +3,7 @@ import { StyleSheet, Dimensions, StatusBar,Text, Button } from "react-native";
 import { GameLoop } from "react-native-game-engine";
 import Worm from "./worm";
 import NextButton from "./nextButton";
-
+import { LinearGradient } from "expo-linear-gradient";
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -35,9 +35,6 @@ export default class SingleTouch extends Component {
     }
   };
 
-  evaluateRoute = () => {
-
-  }
 
   trackMovement = (val) => {
     //val is an intersection, can't touch intersection more than once
@@ -86,15 +83,23 @@ export default class SingleTouch extends Component {
 
   render() {
     return (
+    
       <GameLoop style={styles.container} onUpdate={this.onUpdate}>
 
         <StatusBar hidden={true} />
 
+{/* 
+        <LinearGradient
+      colors={["#E96443", "#904E95"]}
+      style={{flex:1, zIndex:-4}}
+    > */}
         <Worm key={this.props.level.name} {...this.state} loadNext = {this.props.loadNext} level = {this.props.level} trackMovementFunc={this.trackMovement}/>
         {this.doneLevel ? <NextButton onPress={this.loadNext} /> : null}
+      {/* </LinearGradient> */}
         
 
       </GameLoop>
+     
     );
   }
 }
