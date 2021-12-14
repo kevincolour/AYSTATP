@@ -16,168 +16,18 @@ export default class Worm extends Component {
 	constructor(props) {
 		super(props);
 		//crazy math to figure out the width while adjusting for padding
-		const padding = 20;
-		const n = this.props.level.size;
-		const width = (WIDTH- (padding*(n+1))) / n;
-		
 		this.state = {
-			gridLocations : [],
-			validPaths : [],
-			renderComplete: false,
-			width: width,
-			padding : padding,
-		}
-		this.createGrid(this.state);
-		console.log("initialized Grid.");
-	}
-
-	//need to move this up to index.js , as well as creategrid();
-	evaluateRoute = () => {
-		//triggers when player reaches the end 
-	
-		//evaluate if tetris rules are met 
-	
-		//check every possible grid spot as a starting location for tetris rule to evaluate
-		  // from each grid spot, try navigating to each spot, start at top of the tetris piece
-		
-		this.props.level.tetrisPieces.forEach((ele,ind) =>{
-			let currentBox = this.state.gridLocations[ele.location.index];
-			this.checkTetrisConstraint( ele.tetrisBlocks, currentBox.x, currentBox.y);
-		})
-	
-	}
-
-	checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
-
-		// console.log(currentX,currentY)
-
-
-		let yCoordOfPath = 0;
-		let xCoordOfPath = 0;
-		let nextBlock = false; 
-		let xCoordOfPathEnd = 0;
-		let yCoordOfPathEnd = 0;
-		let hitEdge  = currentY - this.state.width < 0 ;
-
-		switch (direction){
-			case "up":
-				nextBlock = tetrisBlock.childUp;
-				xCoordOfPath = currentX - this.state.padding;
-			    yCoordOfPath = currentY - this.state.padding;
-				yCoordOfPathEnd = yCoordOfPath;
-				xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-				hitEdge  = currentY - this.state.width < 0 ;
-				break;
-			case "left":
-				nextBlock = tetrisBlock.childLeft;
-				xCoordOfPath = currentX - this.state.padding;
-			    yCoordOfPath = currentY - this.state.padding;
-				yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
-				xCoordOfPathEnd = xCoordOfPath; 
-				hitEdge  = currentX - this.state.width < 0 ;
-				break;
-			case "right":
-				nextBlock = tetrisBlock.childRight;
-				xCoordOfPath = currentX + this.state.width;
-			    yCoordOfPath = currentY - this.state.padding;
-				yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
-				xCoordOfPathEnd = xCoordOfPath; 
-				hitEdge  = currentX + this.state.width > WIDTH ;
-				break;
-			case "down":
-				nextBlock = tetrisBlock.childDown;
-				xCoordOfPath = currentX - this.state.padding;
-			    yCoordOfPath = currentY + this.state.width;
-				yCoordOfPathEnd = yCoordOfPath;
-				xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-				hitEdge  = currentY + this.state.width > WIDTH ;
-				break;
-		}
-		// console.log(xCoordOfPath,yCoordOfPath );
-		// console.log(xCoordOfPathEnd, yCoordOfPathEnd);
-		// console.log({hitEdge})
-
-		if (nextBlock){
-			console.log(nextBlock);
-			// this.checkTetrisConstraint(tetrisBlock,nextBlock);
-		}
-		else{
-			//need to be either the border, or the edge of screen
-			if (!(hitEdge || (this.props.movement.slice(0,this.props.movement.length - 1).some(
-				(ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
-			 (this.props.movement[index + 1][0] ==  xCoordOfPathEnd && this.props.movement[index + 1][1] ==  yCoordOfPathEnd 
-			  || 
-			 this.props.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.props.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd
-			  
-			  )
-			 ) 
-			)))
-			{
-				//one of the conditions above was true, puzzle failed
-				console.log(direction + " failed");
-					return false;
-			}
-			else{
-				console.log("made it");
-			}
-			
+			endState : false
 		}
 	}
 
-	checkTetrisConstraint = ( tetrisBlock, currentX, currentY) =>{
 	
-		// this.checkConstraintDirection("up", tetrisBlock, currentX, currentY);
-		// this.checkConstraintDirection("left", tetrisBlock, currentX, currentY);
-		// this.checkConstraintDirection("right", tetrisBlock, currentX, currentY);
-		this.checkConstraintDirection("down", tetrisBlock, currentX, currentY);
-
-   }
-
-
-	
-
-	createGrid(state){
-
-		//array of xstart,xend,ystart,yend
-		const gridLocations = [];
-
-	
-		const validPaths = [];
-		validPaths.push(0)
-		const padding = this.state.padding;
-		let xPointer = padding;
-
-
-		//try and center the grid
-		// let topOffset = HEIGHT/ 2 - WIDTH /2;
-		let yPointer = padding ;
-
-		for (let i = 0; i < this.props.level.size; i++){
-			//row reset
-			xPointer = padding;
-			for (let j = 0; j < this.props.level.size; j++){
-				let newGrid = {};
-				newGrid.x = xPointer;
-				newGrid.y = yPointer;
-				newGrid.width = this.state.width;
-				newGrid.height = this.state.width;
-				gridLocations.push(newGrid);
-
-				xPointer += this.state.width + padding;
-			}
-			
-			validPaths.push(yPointer + this.state.width);
-			yPointer += this.state.width + padding;
-		}
-		state.validPaths = validPaths;
-
-		
-		 state.gridLocations = gridLocations;
-
-	}
 
 	render() {
-		const padding = this.state.padding;
+
+	
+
+		const padding = this.props.padding;
 // var closestXY = validPaths.reduce(function(prev, curr) {
 		// 	var a = Math.hypot(prev[0]-goalX, prev[1]-goalY);
 		// 	var b = Math.hypot(curr[0]-goalX, curr[1]-goalY);
@@ -190,22 +40,18 @@ export default class Worm extends Component {
 		let xVal = this.props.x;
 		let yVal = this.props.y;
 		//the following only works because each valid path has the same x,y values since top,left starts at 0 
-		var closestX = this.state.validPaths.reduce(function(prev, curr) {
+		var closestX = this.props.validPaths.reduce(function(prev, curr) {
 			return (Math.abs(curr - xVal) < Math.abs(prev - xVal) ? curr : prev);
 			});
 
-		var closestY = this.state.validPaths.reduce(function(prev, curr) {
+		var closestY = this.props.validPaths.reduce(function(prev, curr) {
 			return (Math.abs(curr - yVal) < Math.abs(prev - yVal) ? curr : prev);
 		});
 	
 		let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
 		let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
 
-    //check if player reached the "end"
-  	  if (closestX >= WIDTH- padding && 0 == closestY){
-		this.state.renderComplete = true;
-		this.evaluateRoute();
-	  }
+
 
 		//new x coord
 			if (lastKnownX != closestX || lastKnownY != closestY){
@@ -260,7 +106,7 @@ export default class Worm extends Component {
 
 		const gridWithPieces = [];
 		const gameObj = this;
-		this.state.gridLocations.forEach(function(ele,ind){
+		this.props.gridLocations.forEach(function(ele,ind){
 			let associatedTetrisPiece = gameObj.props.level.tetrisPieces.find((ele) => ele.location.index == ind)
 			let square =             <View 
 			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
@@ -281,7 +127,7 @@ export default class Worm extends Component {
 
 		return (
 			<>
-			{(this.state.renderComplete && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
+			{(this.props.renderComplete && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
 
 			<Pressable
 				onPress={() => {

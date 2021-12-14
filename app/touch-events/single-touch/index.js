@@ -11,17 +11,30 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 
 
-const padding = 20;
 export default class SingleTouch extends Component {
   constructor(props) {
     super(props);
+    const padding = 20;
+		const n = this.props.level.size;
     this.yStart = WIDTH - padding;
+
+    const width = (WIDTH- (padding*(n+1))) / n;
     this.state = {
       x: 0,
       y: this.yStart,
       movement: [],
-      victory: false
+      victory: false,
+      gridLocations : [],
+			validPaths : [],
+			width: width,
+			padding : padding,
+			renderComplete: false,
     };
+    this.createGrid(this.state);
+  }
+
+  setRenderComplete = (complete) => {
+    this.setState({renderComplete : complete})
   }
 
   onUpdate = ({ touches }) => {
@@ -45,6 +58,12 @@ export default class SingleTouch extends Component {
     //check if snake dies
     
     let alreadyTraversedVal = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
+
+
+    //check if player reached the "end"
+    if (val[0] >= WIDTH- this.state.padding && 0 == val[1]){
+      this.evaluateRoute();
+    }
 
 		//check if player reversed route ! 
 
@@ -79,7 +98,152 @@ export default class SingleTouch extends Component {
 
   }
 
- 
+ //need to move this up to index.js , as well as creategrid();
+ evaluateRoute = () => {
+  //triggers when player reaches the end 
+
+  //evaluate if tetris rules are met 
+
+  //check every possible grid spot as a starting location for tetris rule to evaluate
+    // from each grid spot, try navigating to each spot, start at top of the tetris piece
+  
+  this.props.level.tetrisPieces.forEach((ele,ind) =>{
+    let currentBox = this.state.gridLocations[ele.location.index];
+    this.checkTetrisConstraint( ele.tetrisBlocks, currentBox.x, currentBox.y);
+  })
+
+}
+
+checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
+
+  // console.log(currentX,currentY)
+  if (tetrisBlock == null){
+    return;
+  }
+
+  let yCoordOfPath = 0;
+  let xCoordOfPath = 0;
+  let nextBlock = false; 
+  let xCoordOfPathEnd = 0;
+  let yCoordOfPathEnd = 0;
+  let hitEdge  = currentY - this.state.width < 0 ;
+
+  switch (direction){
+    case "up":
+      nextBlock = tetrisBlock.childUp;
+      xCoordOfPath = currentX - this.state.padding;
+        yCoordOfPath = currentY - this.state.padding;
+      yCoordOfPathEnd = yCoordOfPath;
+      xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
+      hitEdge  = currentY - this.state.width < 0 ;
+      break;
+    case "left":
+      nextBlock = tetrisBlock.childLeft;
+      xCoordOfPath = currentX - this.state.padding;
+        yCoordOfPath = currentY - this.state.padding;
+      yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
+      xCoordOfPathEnd = xCoordOfPath; 
+      hitEdge  = currentX - this.state.width < 0 ;
+      break;
+    case "right":
+      nextBlock = tetrisBlock.childRight;
+      xCoordOfPath = currentX + this.state.width;
+        yCoordOfPath = currentY - this.state.padding;
+      yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
+      xCoordOfPathEnd = xCoordOfPath; 
+      hitEdge  = currentX + this.state.width > WIDTH ;
+      break;
+    case "down":
+      nextBlock = tetrisBlock.childDown;
+      xCoordOfPath = currentX - this.state.padding;
+        yCoordOfPath = currentY + this.state.width;
+      yCoordOfPathEnd = yCoordOfPath;
+      xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
+      hitEdge  = currentY + this.state.width > WIDTH ;
+      break;
+  }
+  // console.log(xCoordOfPath,yCoordOfPath );
+  // console.log(xCoordOfPathEnd, yCoordOfPathEnd);
+  // console.log({hitEdge})
+
+  if (nextBlock){
+    console.log(nextBlock);
+    // this.checkTetrisConstraint(tetrisBlock,nextBlock);
+  }
+  else{
+    //need to be either the border, or the edge of screen
+    if (!(hitEdge || (this.state.movement.slice(0,this.state.movement.length - 1).some(
+      (ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
+     (this.state.movement[index + 1][0] ==  xCoordOfPathEnd && this.state.movement[index + 1][1] ==  yCoordOfPathEnd 
+      || 
+     this.state.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.state.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd
+      
+      )
+     ) 
+    )))
+    {
+      //one of the conditions above was true, puzzle failed
+      console.log(direction + " failed");
+        return false;
+    }
+    else{
+      console.log("made it");
+    }
+    
+  }
+}
+
+checkTetrisConstraint = ( tetrisBlock, currentX, currentY) =>{
+
+  // this.checkConstraintDirection("up", tetrisBlock, currentX, currentY);
+  // this.checkConstraintDirection("left", tetrisBlock, currentX, currentY);
+  // this.checkConstraintDirection("right", tetrisBlock, currentX, currentY);
+  this.checkConstraintDirection("down", tetrisBlock, currentX, currentY);
+
+ }
+
+
+
+
+createGrid(state){
+
+  //array of xstart,xend,ystart,yend
+  const gridLocations = [];
+
+
+  const validPaths = [];
+  validPaths.push(0)
+  const padding = this.state.padding;
+  let xPointer = padding;
+
+
+  //try and center the grid
+  // let topOffset = HEIGHT/ 2 - WIDTH /2;
+  let yPointer = padding ;
+
+  for (let i = 0; i < this.props.level.size; i++){
+    //row reset
+    xPointer = padding;
+    for (let j = 0; j < this.props.level.size; j++){
+      let newGrid = {};
+      newGrid.x = xPointer;
+      newGrid.y = yPointer;
+      newGrid.width = this.state.width;
+      newGrid.height = this.state.width;
+      gridLocations.push(newGrid);
+
+      xPointer += this.state.width + padding;
+    }
+    
+    validPaths.push(yPointer + this.state.width);
+    yPointer += this.state.width + padding;
+  }
+  state.validPaths = validPaths;
+
+  
+   state.gridLocations = gridLocations;
+
+}
 
   render() {
     return (
@@ -93,7 +257,13 @@ export default class SingleTouch extends Component {
       colors={["#E96443", "#904E95"]}
       style={{flex:1, zIndex:-4}}
     > */}
-        <Worm key={this.props.level.name} {...this.state} loadNext = {this.props.loadNext} level = {this.props.level} trackMovementFunc={this.trackMovement}/>
+        <Worm key={this.props.level.name} 
+        {...this.state} 
+        loadNext = {this.props.loadNext} 
+        level = {this.props.level}
+        evaluateRoute = {this.evaluateRoute}
+        setRenderComplete = {this.setRenderComplete}
+        trackMovementFunc={this.trackMovement}/>
         {this.doneLevel ? <NextButton onPress={this.loadNext} /> : null}
       {/* </LinearGradient> */}
         

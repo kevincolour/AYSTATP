@@ -91,6 +91,9 @@ export default class App extends Component {
     });
   };
 
+  
+
+
   nextLevelLoad = () =>{
     let newLevel = this.state.currentLevelIndex + 1;
     let newLevelComponent = <SingleTouch key = {newLevel} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
