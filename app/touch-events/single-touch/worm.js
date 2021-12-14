@@ -15,7 +15,6 @@ export default class Worm extends Component {
 
 	constructor(props) {
 		super(props);
-		//crazy math to figure out the width while adjusting for padding
 		this.state = {
 			endState : false
 		}
@@ -127,7 +126,7 @@ export default class Worm extends Component {
 
 		return (
 			<>
-			{(this.props.renderComplete && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
+			{(this.props.success && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
 
 			<Pressable
 				onPress={() => {

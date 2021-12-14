@@ -29,6 +29,8 @@ export default class SingleTouch extends Component {
 			width: width,
 			padding : padding,
 			renderComplete: false,
+      success : false,
+      failure : false
     };
     this.createGrid(this.state);
   }
@@ -61,7 +63,7 @@ export default class SingleTouch extends Component {
 
 
     //check if player reached the "end"
-    if (val[0] >= WIDTH- this.state.padding && 0 == val[1]){
+    if (val[0] >= WIDTH- this.state.padding && 0 == val[1] && !this.props.success && !this.props.failure){
       this.evaluateRoute();
     }
 
@@ -109,17 +111,26 @@ export default class SingleTouch extends Component {
   
   this.props.level.tetrisPieces.forEach((ele,ind) =>{
     let currentBox = this.state.gridLocations[ele.location.index];
-    this.checkTetrisConstraint( ele.tetrisBlocks, currentBox.x, currentBox.y);
+    let constraintCheck = this.checkTetrisConstraint(ele, ele.tetrisBlocks, "", currentBox.x, currentBox.y);
+    console.log("RESULT")
+    console.log(constraintCheck)
+
+    if (constraintCheck){
+      this.setState({success:true})
+    }
   })
 
 }
 
-checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
+checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, currentY) => {
 
   // console.log(currentX,currentY)
-  if (tetrisBlock == null){
-    return;
+  if (tetrisBlock == null || tetrisBlock == undefined){
+    return true;
   }
+
+
+
 
   let yCoordOfPath = 0;
   let xCoordOfPath = 0;
@@ -135,7 +146,7 @@ checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
         yCoordOfPath = currentY - this.state.padding;
       yCoordOfPathEnd = yCoordOfPath;
       xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-      hitEdge  = currentY - this.state.width < 0 ;
+      hitEdge  = currentY - (this.state.width + this.state.padding) <= 0 ;
       break;
     case "left":
       nextBlock = tetrisBlock.childLeft;
@@ -143,7 +154,7 @@ checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
         yCoordOfPath = currentY - this.state.padding;
       yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
       xCoordOfPathEnd = xCoordOfPath; 
-      hitEdge  = currentX - this.state.width < 0 ;
+      hitEdge  = currentX - (this.state.width + this.state.padding) <= 0 ;
       break;
     case "right":
       nextBlock = tetrisBlock.childRight;
@@ -151,7 +162,7 @@ checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
         yCoordOfPath = currentY - this.state.padding;
       yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
       xCoordOfPathEnd = xCoordOfPath; 
-      hitEdge  = currentX + this.state.width > WIDTH ;
+      hitEdge  = currentX + this.state.width + this.state.padding >= WIDTH ;
       break;
     case "down":
       nextBlock = tetrisBlock.childDown;
@@ -159,46 +170,74 @@ checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
         yCoordOfPath = currentY + this.state.width;
       yCoordOfPathEnd = yCoordOfPath;
       xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-      hitEdge  = currentY + this.state.width > WIDTH ;
+      hitEdge  = currentY + this.state.width + this.state.padding >= WIDTH ;
+
       break;
   }
   // console.log(xCoordOfPath,yCoordOfPath );
   // console.log(xCoordOfPathEnd, yCoordOfPathEnd);
   // console.log({hitEdge})
-
+  let borderCondition = (this.state.movement.slice(0,this.state.movement.length - 1).some(
+    (ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
+   (this.state.movement[index + 1][0] ==  xCoordOfPathEnd && this.state.movement[index + 1][1] ==  yCoordOfPathEnd 
+    || 
+   this.state.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.state.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd
+    
+    )
+   ) 
+  );
   if (nextBlock){
-    console.log(nextBlock);
-    // this.checkTetrisConstraint(tetrisBlock,nextBlock);
-  }
-  else{
-    //need to be either the border, or the edge of screen
-    if (!(hitEdge || (this.state.movement.slice(0,this.state.movement.length - 1).some(
-      (ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
-     (this.state.movement[index + 1][0] ==  xCoordOfPathEnd && this.state.movement[index + 1][1] ==  yCoordOfPathEnd 
-      || 
-     this.state.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.state.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd
-      
-      )
-     ) 
-    )))
-    {
-      //one of the conditions above was true, puzzle failed
-      console.log(direction + " failed");
-        return false;
+    if (borderCondition || hitEdge){
+      console.log("hit a border but needs space")
+      return false
     }
     else{
-      console.log("made it");
+      return this.checkTetrisConstraint(tetrisPiece, nextBlock, direction, xCoordOfPath + this.state.padding, yCoordOfPath + this.state.padding);
+    }
+  }
+  else{
+    
+    //need to be either the border, or the edge of screen
+    if (!(hitEdge || borderCondition))
+    {
+      //one of the conditions above was true, puzzle failed
+      console.log(xCoordOfPath,yCoordOfPath + " failed in direction");
+      console.log(direction + " failed");
+
+      //this means that there is an open spot in `direction` , let's try starting again from there while preventing backtracking.
+      // still repeating work because can't exit recursive stack
+      //  let newAttempt = this.checkTetrisConstraint(tetrisPiece, tetrisPiece.tetrisBlocks,direction, xCoordOfPath + this.state.padding, yCoordOfPath + this.state.padding);
+      let newAttempt = false;
+      return newAttempt 
+    }
+    else{
+      console.log(xCoordOfPath,yCoordOfPath + " made it");
+      return true;
     }
     
   }
 }
 
-checkTetrisConstraint = ( tetrisBlock, currentX, currentY) =>{
+checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, currentY) =>{
 
-  // this.checkConstraintDirection("up", tetrisBlock, currentX, currentY);
-  // this.checkConstraintDirection("left", tetrisBlock, currentX, currentY);
-  // this.checkConstraintDirection("right", tetrisBlock, currentX, currentY);
-  this.checkConstraintDirection("down", tetrisBlock, currentX, currentY);
+  console.log("NEW TETRIS BLOCK")
+  console.log(tetrisBlock);
+  
+  let aggregateBool = true; 
+
+  if (previousDirection != "down"){
+    aggregateBool = aggregateBool && this.checkConstraintDirection("up", tetrisPiece,tetrisBlock, currentX, currentY);
+  }
+  if (aggregateBool && previousDirection != "right"){
+    aggregateBool = aggregateBool && this.checkConstraintDirection("left",tetrisPiece, tetrisBlock, currentX, currentY);
+  }
+  if (aggregateBool && previousDirection != "left"){
+    aggregateBool = aggregateBool && this.checkConstraintDirection("right",tetrisPiece, tetrisBlock, currentX, currentY);
+  }
+  if (aggregateBool && previousDirection != "up"){
+    aggregateBool = aggregateBool && this.checkConstraintDirection("down", tetrisPiece,tetrisBlock, currentX, currentY);
+  }
+  return aggregateBool;
 
  }
 

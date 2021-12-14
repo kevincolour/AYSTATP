@@ -36,7 +36,7 @@ const level1 = {
     {
       x:1,
       y:1,
-      index: 10
+      index: 11
     },
     tetrisBlocks :
     {
@@ -91,7 +91,7 @@ export default class App extends Component {
     });
   };
 
-  
+
 
 
   nextLevelLoad = () =>{
