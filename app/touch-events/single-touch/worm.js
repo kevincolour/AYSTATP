@@ -41,60 +41,65 @@ export default class Worm extends Component {
 		  // from each grid spot, try navigating to each spot, start at top of the tetris piece
 		
 		this.props.level.tetrisPieces.forEach((ele,ind) =>{
-			this.checkTetrisConstraint(ele);
+			let currentBox = this.state.gridLocations[ele.location.index];
+			this.checkTetrisConstraint( ele.tetrisBlocks, currentBox.x, currentBox.y);
 		})
 	
 	}
 
-	checkConstraintDirection = (direction, tetrisPiece) => {
-		let currentBox = this.state.gridLocations[tetrisPiece.location.index];
+	checkConstraintDirection = (direction, tetrisBlock, currentX, currentY) => {
+
+		// console.log(currentX,currentY)
+
+
 		let yCoordOfPath = 0;
 		let xCoordOfPath = 0;
-		let needToRecurse = false; 
+		let nextBlock = false; 
 		let xCoordOfPathEnd = 0;
 		let yCoordOfPathEnd = 0;
-		let hitEdge  = currentBox.y - this.state.width < 0 ;
+		let hitEdge  = currentY - this.state.width < 0 ;
 
 		switch (direction){
 			case "up":
-				needToRecurse = tetrisPiece.childUp;
-				xCoordOfPath = currentBox.x - this.state.padding;
-			    yCoordOfPath = currentBox.y - this.state.padding;
+				nextBlock = tetrisBlock.childUp;
+				xCoordOfPath = currentX - this.state.padding;
+			    yCoordOfPath = currentY - this.state.padding;
 				yCoordOfPathEnd = yCoordOfPath;
 				xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-				hitEdge  = currentBox.y - this.state.width < 0 ;
+				hitEdge  = currentY - this.state.width < 0 ;
 				break;
 			case "left":
-				needToRecurse = tetrisPiece.childLeft;
-				xCoordOfPath = currentBox.x - this.state.padding;
-			    yCoordOfPath = currentBox.y - this.state.padding;
+				nextBlock = tetrisBlock.childLeft;
+				xCoordOfPath = currentX - this.state.padding;
+			    yCoordOfPath = currentY - this.state.padding;
 				yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
 				xCoordOfPathEnd = xCoordOfPath; 
-				hitEdge  = currentBox.x - this.state.width < 0 ;
+				hitEdge  = currentX - this.state.width < 0 ;
 				break;
 			case "right":
-				needToRecurse = tetrisPiece.childLeft;
-				xCoordOfPath = currentBox.x + this.state.width;
-			    yCoordOfPath = currentBox.y - this.state.padding;
+				nextBlock = tetrisBlock.childRight;
+				xCoordOfPath = currentX + this.state.width;
+			    yCoordOfPath = currentY - this.state.padding;
 				yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
 				xCoordOfPathEnd = xCoordOfPath; 
-				hitEdge  = currentBox.x + this.state.width > WIDTH ;
+				hitEdge  = currentX + this.state.width > WIDTH ;
 				break;
 			case "down":
-				needToRecurse = tetrisPiece.childDown;
-				xCoordOfPath = currentBox.x - this.state.padding;
-			    yCoordOfPath = currentBox.y + this.state.width;
+				nextBlock = tetrisBlock.childDown;
+				xCoordOfPath = currentX - this.state.padding;
+			    yCoordOfPath = currentY + this.state.width;
 				yCoordOfPathEnd = yCoordOfPath;
 				xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-				hitEdge  = currentBox.y + this.state.width > WIDTH ;
+				hitEdge  = currentY + this.state.width > WIDTH ;
 				break;
 		}
 		// console.log(xCoordOfPath,yCoordOfPath );
 		// console.log(xCoordOfPathEnd, yCoordOfPathEnd);
 		// console.log({hitEdge})
 
-		if (needToRecurse){
-			//recurse upwards
+		if (nextBlock){
+			console.log(nextBlock);
+			// this.checkTetrisConstraint(tetrisBlock,nextBlock);
 		}
 		else{
 			//need to be either the border, or the edge of screen
@@ -119,12 +124,12 @@ export default class Worm extends Component {
 		}
 	}
 
-	checkTetrisConstraint = (tetrisPiece) =>{
+	checkTetrisConstraint = ( tetrisBlock, currentX, currentY) =>{
 	
-		this.checkConstraintDirection("up",tetrisPiece);
-		this.checkConstraintDirection("left",tetrisPiece);
-		this.checkConstraintDirection("right",tetrisPiece);
-		this.checkConstraintDirection("down",tetrisPiece);
+		// this.checkConstraintDirection("up", tetrisBlock, currentX, currentY);
+		// this.checkConstraintDirection("left", tetrisBlock, currentX, currentY);
+		// this.checkConstraintDirection("right", tetrisBlock, currentX, currentY);
+		this.checkConstraintDirection("down", tetrisBlock, currentX, currentY);
 
    }
 

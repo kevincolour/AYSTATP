@@ -28,7 +28,6 @@ export default class TableOfContents extends Component {
   }
 
   onItemPress = async data => {
-    console.log(data);
     if (data.items) {
       let refs = [this.state.heading, "back"].concat(
         this.state.items.map(x => x.heading)

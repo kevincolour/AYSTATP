@@ -38,12 +38,14 @@ const level1 = {
       y:1,
       index: 10
     },
-    childDown : {
-      childRight : {
-        noChild :true 
+    tetrisBlocks :
+    {
+      childDown : {
+        childRight : {
+          noChild :true 
       },
     },
-    horizontalCount : 0
+  }
   }]
 }
 
