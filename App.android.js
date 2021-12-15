@@ -36,7 +36,7 @@ const level1 = {
     {
       x:1,
       y:1,
-      index: 11
+      index: 10
     },
     tetrisBlocks :
     {
