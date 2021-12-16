@@ -39,11 +39,11 @@ export default class Worm extends Component {
 		let xVal = this.props.x;
 		let yVal = this.props.y;
 		//the following only works because each valid path has the same x,y values since top,left starts at 0 
-		var closestX = this.props.validPaths.reduce(function(prev, curr) {
+		var closestX = this.props.validPathsX.reduce(function(prev, curr) {
 			return (Math.abs(curr - xVal) < Math.abs(prev - xVal) ? curr : prev);
 			});
 
-		var closestY = this.props.validPaths.reduce(function(prev, curr) {
+		var closestY = this.props.validPathsY.reduce(function(prev, curr) {
 			return (Math.abs(curr - yVal) < Math.abs(prev - yVal) ? curr : prev);
 		});
 	

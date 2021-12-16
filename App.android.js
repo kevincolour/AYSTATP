@@ -29,7 +29,8 @@ const levelPrologue = {
 }
 const level1 = {
   name: "level1",
-  size : 4,
+  rows : 4,
+  columns : 4,
   tetrisPieces : [{
     ...tetrisObjects.tPiece,
     location:
@@ -41,7 +42,8 @@ const level1 = {
 
 const level2 = {
   name: "squarePiece",
-  size : 3,
+  rows : 3,
+  columns : 3,
   tetrisPieces : [{
     ...tetrisObjects.twoPiece,
     location:{
@@ -52,7 +54,8 @@ const level2 = {
 
 const level3 = {
   name: "squarePiece",
-  size : 3,
+  rows : 3,
+  columns : 3,
   tetrisPieces : [{
     ...tetrisObjects.squarePiece,
     location:{
@@ -62,7 +65,8 @@ const level3 = {
 }
 const level4 = {
   name: "lPiece",
-  size : 4,
+  rows : 3,
+  columns : 3,
   tetrisPieces : [{
     ...tetrisObjects.lPiece,
     location:{
@@ -73,7 +77,8 @@ const level4 = {
 
 const level5 = {
   name: "squarePiece",
-  size : 3,
+  rows : 3,
+  columns : 3,
   tetrisPieces : [{
     ...tetrisObjects.twoPieceVertical,
     location:{
@@ -81,7 +86,15 @@ const level5 = {
     }
   }]
 }
-const levels = [levelPrologue,level1,level2,level3,level4, level5];
+
+const level6 = {
+  name: "squarePiece",
+  rows : 3,
+  columns : 1,
+  tetrisPieces : []
+}
+
+const levels = [levelPrologue,level1,level2,level3,level4, level5, level6];
 
 
 export default class App extends Component {
@@ -89,7 +102,7 @@ export default class App extends Component {
 
     super(props);
     this.state = {
-      currentLevelIndex: 0,
+      currentLevelIndex: 6,
       sceneVisible: false,
       scene: null
     };

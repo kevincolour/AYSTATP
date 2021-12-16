@@ -15,18 +15,23 @@ export default class SingleTouch extends Component {
   constructor(props) {
     super(props);
     const padding = 20;
-		this.n = this.props.level.columns;
+		this.n = Math.max(this.props.level.columns, this.props.level.rows);
     this.yStart = WIDTH - padding;
 
-    const width = Math.ceil((WIDTH- (padding*(this.n+1))) / this.n);
+    const width = Math.ceil((WIDTH- (padding*(this.n +1))) / this.n);
+    const height = width;
+
+
     this.state = {
       x: 0,
       y: this.yStart,
       movement: [],
       victory: false,
       gridLocations : [],
-			validPaths : [],
+			validPathsX : [],
+      validPathsY : [],
 			width: width,
+      height: height,
 			padding : padding,
 			renderComplete: false,
       success : false,
@@ -273,7 +278,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
       && !visited.some((ele) => ele[0] == nextX && ele[1] == nextY )
    ){
         console.log("push new start", nextX, nextY)
-        //  currentPossibleStarts.push([nextX , nextY])
+         currentPossibleStarts.push([nextX , nextY])
       }
       return newAttempt 
     }
@@ -332,8 +337,12 @@ createGrid(state){
   const gridLocations = [];
 
 
-  const validPaths = [];
-  validPaths.push(0)
+  const validPathsX = [];
+  validPathsX.push(0)
+
+  const validPathsY = [];
+  validPathsY.push(0)
+
   const padding = this.state.padding;
   let xPointer = padding;
 
@@ -341,26 +350,33 @@ createGrid(state){
   //try and center the grid
   // let topOffset = HEIGHT/ 2 - WIDTH /2;
   let yPointer = padding ;
-console.log(this.n);
-  for (let i = 0; i < this.n; i++){
+  for (let i = 0; i < this.props.level.rows; i++){
     //row reset
     xPointer = padding;
-    for (let j = 0; j < this.n; j++){
+    for (let j = 0; j < this.props.level.columns; j++){
       let newGrid = {};
       newGrid.x = xPointer;
       newGrid.y = yPointer;
       newGrid.width = this.state.width;
-      newGrid.height = this.state.width;
+      newGrid.height = this.state.height;
       gridLocations.push(newGrid);
 
       xPointer += this.state.width + padding;
     }
     
-    validPaths.push(yPointer + this.state.width);
+    validPathsY.push(yPointer + this.state.width);
     yPointer += this.state.width + padding;
   }
-  state.validPaths = validPaths;
+  //POPULATE VALID PATHS X
+  let validPathPtr = padding;
+  for (let j = 0; j < this.props.level.columns; j++){
+    validPathsX.push(validPathPtr + this.state.width);
+    validPathPtr += this.state.width + padding;
+  }
 
+  state.validPathsX = validPathsX;
+  state.validPathsY = validPathsY;
+  console.log(validPathsX,validPathsY);
   
    state.gridLocations = gridLocations;
 
