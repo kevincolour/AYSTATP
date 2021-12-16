@@ -126,11 +126,11 @@ export default class Worm extends Component {
 
 		return (
 			<>
-			{(this.props.success && <View style = {{position:"absolute", top:500,left:200, width:200,height:200}}>
+			{(this.props.success && <View style = {{position:"absolute", top:HEIGHT - 200,left:WIDTH-100, width:200,height:200}}>
 
 			<Pressable
 				onPress={() => {
-					this.props.loadNext();
+					this.props.loadNext(1);
 				}}
 				style={({ pressed }) => [
 				{
@@ -142,11 +142,35 @@ export default class Worm extends Component {
 				]}>
 				{({ pressed }) => (
 				<Text style={styles.text}>
-					{pressed ? 'Pressed!' : 'Press Me'}
+					{pressed ? 'Pressed!' : 'Next!'}
 				</Text>
 				)}
       		</Pressable>
 			</View>)}
+
+
+			{(<View style = {{position:"absolute", top:HEIGHT - 200 ,left:20, width:200,height:200}}>
+
+<Pressable
+	onPress={() => {
+		this.props.loadNext(-1);
+	}}
+	style={({ pressed }) => [
+	{
+		backgroundColor: pressed
+		? 'rgb(210, 230, 255)'
+		: 'white'
+	},
+	styles.wrapperCustom
+	]}>
+	{({ pressed }) => (
+	<Text style={styles.text}>
+		{pressed ? 'Pressed!' : 'Previous'}
+	</Text>
+	)}
+  </Pressable>
+</View>)}
+
 			{gridWithPieces}
 
 			{viewPath}

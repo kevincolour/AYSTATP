@@ -5,7 +5,9 @@ import EStyleSheet from "react-native-extended-stylesheet";
 
 import TableOfContents from "./app/table-of-contents";
 import SingleTouch from "./app/touch-events/single-touch";
+import {tetrisObjects} from "./app/TetrisObjects"
 EStyleSheet.build();
+
 
 //-- There is a bunch of warnings about the use of deprecated lifecycle methods. A lot of them are caused
 //-- by dependencies. Comment out the line below to see the warnings.
@@ -17,53 +19,58 @@ const levelPrologue = {
   name: "levelPrologue",
   size : 1,
   tetrisPieces : [{
+    ...tetrisObjects.singlePiece,
     location:
     {
-      x:1,
-      y:1
+      index: 0
     },
-    verticalCount :0,
-    horizontalCount : 0
   }]
 }
-
 const level1 = {
   name: "level1",
   size : 4,
   tetrisPieces : [{
-    img: require("./assets/Tetris/TetrisPiece1.png"),
+    ...tetrisObjects.tPiece,
     location:
     {
-      x:1,
-      y:1,
       index: 10
     },
-    tetrisBlocks :
-    {
-      childDown : {
-        childRight : {
-          noChild :true 
-      },
-    },
-  }
   }]
 }
 
 const level2 = {
-  name: "level2",
+  name: "squarePiece",
   size : 3,
   tetrisPieces : [{
-    location:
-    {
-      x:1,
-      y:1
-    },
-    verticalCount :0,
-    horizontalCount : 0
+    ...tetrisObjects.twoPiece,
+    location:{
+      index: 4
+    }
   }]
 }
 
-const levels = [levelPrologue,level1,level2];
+const level3 = {
+  name: "squarePiece",
+  size : 3,
+  tetrisPieces : [{
+    ...tetrisObjects.squarePiece,
+    location:{
+      index: 4
+    }
+  }]
+}
+const level4 = {
+  name: "lPiece",
+  size : 4,
+  tetrisPieces : [{
+    ...tetrisObjects.lPiece,
+    location:{
+      index: 1
+    }
+  }]
+}
+
+const levels = [levelPrologue,level1,level2,level3,level4];
 
 
 export default class App extends Component {
@@ -94,8 +101,12 @@ export default class App extends Component {
 
 
 
-  nextLevelLoad = () =>{
-    let newLevel = this.state.currentLevelIndex + 1;
+  nextLevelLoad = (increment) =>{
+    console.log(increment);
+    let newLevel = this.state.currentLevelIndex + increment;
+    if (newLevel < 0){
+      return;
+    }
     let newLevelComponent = <SingleTouch key = {newLevel} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
     this.setState({
       sceneVisible:true,

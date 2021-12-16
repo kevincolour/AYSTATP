@@ -18,7 +18,7 @@ export default class SingleTouch extends Component {
 		const n = this.props.level.size;
     this.yStart = WIDTH - padding;
 
-    const width = (WIDTH- (padding*(n+1))) / n;
+    const width = Math.ceil((WIDTH- (padding*(n+1))) / n);
     this.state = {
       x: 0,
       y: this.yStart,
@@ -53,7 +53,6 @@ export default class SingleTouch extends Component {
 
   trackMovement = (val) => {
     //val is an intersection, can't touch intersection more than once
-
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
 
@@ -63,8 +62,11 @@ export default class SingleTouch extends Component {
 
 
     //check if player reached the "end"
-    if (val[0] >= WIDTH- this.state.padding && 0 == val[1] && !this.props.success && !this.props.failure){
+    if (Math.ceil(val[0]) >= WIDTH- this.state.padding && 0 == val[1] && !this.props.success && !this.props.failure){
       this.evaluateRoute();
+    }
+    else{
+      this.setState({success: false, failure: false})
     }
 
 		//check if player reversed route ! 
@@ -226,15 +228,17 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
    ) 
   );
   if (nextBlock){
-    
-    if (borderCondition){
+    // eventually want to make more possible starts (in the case next block is somewhere we would like to start at some point) 
+    // currentPossibleStarts.push([nextX , nextY])
+
+    if (borderCondition || hitEdge){
       console.log(direction + " failed (found border when child piece exists)");
       return false;
     }
     console.log("NEXT BLOCK");
     console.log(currentPossibleStarts)
     
-      return this.checkTetrisConstraint(tetrisPiece, nextBlock, direction, xCoordOfPath + this.state.padding, yCoordOfPath + this.state.padding,currentPossibleStarts,visited);
+      return this.checkTetrisConstraint(tetrisPiece, nextBlock, direction, nextX,  nextY,currentPossibleStarts,visited);
     
   }
   else{
