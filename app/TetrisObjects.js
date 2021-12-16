@@ -43,19 +43,29 @@ export const tetrisObjects = {
             },
         },
     },
+    twoPieceVertical: {
+        img: require("../assets/Tetris/TetrisPieceDouble.png"),
+  
+        tetrisBlocks :
+        {
+            childDown : {
+              noChild :true 
+            },
+        },
+    },
     squarePiece: {
         img: require("../assets/Tetris/TetrisPieceSquare.png"),
-  
+        name: "Square",
         tetrisBlocks :
         {
                 childDown:{
                     childRight:{
-                        noChild:true
+                        childUp :{
+                            noChild:true
+
+                        },
                     }
                 },
-                childRight:{
-                        noChild:true
-                }
             
         },
     },

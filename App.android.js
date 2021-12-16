@@ -17,7 +17,8 @@ console.disableYellowBox = true;
 
 const levelPrologue = {
   name: "levelPrologue",
-  size : 1,
+  rows : 1,
+  columns : 1,
   tetrisPieces : [{
     ...tetrisObjects.singlePiece,
     location:
@@ -55,7 +56,7 @@ const level3 = {
   tetrisPieces : [{
     ...tetrisObjects.squarePiece,
     location:{
-      index: 4
+      index: 0
     }
   }]
 }
@@ -70,7 +71,17 @@ const level4 = {
   }]
 }
 
-const levels = [levelPrologue,level1,level2,level3,level4];
+const level5 = {
+  name: "squarePiece",
+  size : 3,
+  tetrisPieces : [{
+    ...tetrisObjects.twoPieceVertical,
+    location:{
+      index: 2
+    }
+  }]
+}
+const levels = [levelPrologue,level1,level2,level3,level4, level5];
 
 
 export default class App extends Component {
@@ -78,7 +89,7 @@ export default class App extends Component {
 
     super(props);
     this.state = {
-      currentLevelIndex: 1,
+      currentLevelIndex: 0,
       sceneVisible: false,
       scene: null
     };
