@@ -123,10 +123,18 @@ export default class Worm extends Component {
 
 			gridWithPieces.push(square);
 		})
-
+		
+		const winImage = 		<Image style ={{position: "absolute",left: (this.props.padding * (this.props.validPathsX.length - 1) + (this.props.validPathsX.length - 1)* this.props.width) , top: this.props.heightTop, width: 40,
+		height:40, 
+		borderWidth: 0, justifyContent: "center", alignItems: "center"}}
+	
+	source={{
+	  uri: 'https://www.seekpng.com/png/detail/24-243121_apple-png-apple-clipart.png',
+	}}
+	  />;
 		return (
 			<>
-			{(this.props.success && <View style = {{position:"absolute", top:HEIGHT - 200,left:WIDTH-100, width:200,height:200}}>
+			{(this.props.success && <View style = {{position:"absolute", top:50,left:WIDTH-100, width:200,height:200}}>
 
 			<Pressable
 				onPress={() => {
@@ -149,7 +157,7 @@ export default class Worm extends Component {
 			</View>)}
 
 
-			{(<View style = {{position:"absolute", top:HEIGHT - 200 ,left:20, width:200,height:200}}>
+			{(<View style = {{position:"absolute", top: 50 ,left:20, width:200,height:200}}>
 
 <Pressable
 	onPress={() => {
@@ -174,15 +182,9 @@ export default class Worm extends Component {
 			{gridWithPieces}
 
 			{viewPath}
+			{winImage}
 		<View >
-		<Image style ={{position: "absolute",left: WIDTH - 40, top: 0, width: 40,
-			height:40, 
-			borderWidth: 0, justifyContent: "center", alignItems: "center"}}
-        
-        source={{
-          uri: 'https://www.seekpng.com/png/detail/24-243121_apple-png-apple-clipart.png',
-        }}
-      	/>
+
 		</View>
 		  {/* <View style = {{position: "absolute", left: lastKnownX, top: lastKnownY, width:200, height:200, backgroundColor: "blue" }}></View> */}
 			<View>

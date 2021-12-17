@@ -16,7 +16,7 @@ export default class SingleTouch extends Component {
     super(props);
     const padding = 20;
 		this.n = Math.max(this.props.level.columns, this.props.level.rows);
-    this.yStart = WIDTH - padding;
+    this.yStart = (HEIGHT/2 + WIDTH/2) - padding;
 
     const width = Math.ceil((WIDTH- (padding*(this.n +1))) / this.n);
     const height = width;
@@ -35,8 +35,10 @@ export default class SingleTouch extends Component {
 			padding : padding,
 			renderComplete: false,
       success : false,
-      failure : false
+      failure : false,
+      heightTop : Math.ceil(HEIGHT/2 - WIDTH/2 - padding)
     };
+    console.log( WIDTH- this.state.padding,  this.state.heightTop)
     this.createGrid(this.state);
   }
 
@@ -65,9 +67,8 @@ export default class SingleTouch extends Component {
     
     let alreadyTraversedVal = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
 
-
     //check if player reached the "end"
-    if (Math.ceil(val[0]) >= WIDTH- this.state.padding && 0 == val[1] && !this.props.success && !this.props.failure){
+    if (Math.ceil(val[0]) >= WIDTH- this.state.padding && val[1] <= this.state.heightTop + this.state.padding && !this.props.success && !this.props.failure){
       this.state.movement.push(val);
       this.evaluateRoute();
     }
@@ -143,7 +144,7 @@ checkAllPossibleStarting = (tetrisPiece, tetrisBlocks, currentPossibleStarts, vi
     let x = currentPossibleStarts[0][0];
     let y = currentPossibleStarts[0][1];
 
-    let outOfBounds =  x >= WIDTH || y >= WIDTH || x <= 0 || y <= 0; 
+    let outOfBounds =  x >= WIDTH ||x <= 0 || y <= this.state.heightTop || y >=  this.state.heightTop + WIDTH ; 
     
     validBool = validBool || (!outOfBounds && this.checkTetrisConstraint(tetrisPiece, tetrisBlocks, "", x, y, currentPossibleStarts,visited, []));
     visited.push(currentPossibleStarts.shift());
@@ -158,7 +159,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
   if (tetrisBlock == null || tetrisBlock == undefined){
     return true;
   }
-  if ( currentX > WIDTH || currentY > WIDTH || currentX < 0 || currentY <0){
+  if (  currentX >= WIDTH ||currentX <= 0 || currentY <= this.state.heightTop || currentY >=  this.state.heightTop + WIDTH  ){
     return false;
   }
 
@@ -178,7 +179,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
         yCoordOfPath = currentY - this.state.padding;
       yCoordOfPathEnd = yCoordOfPath;
       xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-      hitEdge  = currentY - (this.state.width + this.state.padding) <= 0 ;
+      hitEdge  = currentY - (this.state.width + this.state.padding) <= this.state.heightTop ;
       nextX = currentX;
       nextY = currentY- (this.state.padding + this.state.width); 
 
@@ -189,7 +190,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
         yCoordOfPath = currentY + this.state.width;
       yCoordOfPathEnd = yCoordOfPath;
       xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-      hitEdge  = currentY + this.state.width + this.state.padding >= WIDTH ;
+      hitEdge  = currentY + this.state.width + this.state.padding >= this.state.heightTop + WIDTH ;
       nextX = currentX;
       nextY = currentY + this.state.padding + this.state.width;
 
@@ -336,20 +337,19 @@ createGrid(state){
   //array of xstart,xend,ystart,yend
   const gridLocations = [];
 
-
-  const validPathsX = [];
-  validPathsX.push(0)
+  const offset = Math.ceil(HEIGHT/2 - WIDTH / 2);
+  const validPathsX = [0];
 
   const validPathsY = [];
-  validPathsY.push(0)
+  validPathsY.push(offset)
 
   const padding = this.state.padding;
-  let xPointer = padding;
+  let xPointer = padding ;
 
 
   //try and center the grid
   // let topOffset = HEIGHT/ 2 - WIDTH /2;
-  let yPointer = padding ;
+  let yPointer = padding + offset;
   for (let i = 0; i < this.props.level.rows; i++){
     //row reset
     xPointer = padding;
