@@ -11,7 +11,7 @@ const COLORS = ["#86E9BE", "#8DE986", "#B8E986", "#E9E986"];
 const BORDER_COLORS = ["#C0F3DD", "#C4F6C0", "#E5FCCD", "#FCFDC1"];
 
 
-export default class Worm extends Component {
+export default class PuzzlePanel extends Component {
 
 	constructor(props) {
 		super(props);
@@ -124,8 +124,8 @@ export default class Worm extends Component {
 			gridWithPieces.push(square);
 		})
 		
-		const winImage = 		<Image style ={{position: "absolute",left: (this.props.padding * (this.props.validPathsX.length - 1) + (this.props.validPathsX.length - 1)* this.props.width) , top: this.props.heightTop, width: 40,
-		height:40, 
+		const winImage = 		<Image style ={{position: "absolute",left: (this.props.padding * (this.props.validPathsX.length - 1) + (this.props.validPathsX.length - 1)* this.props.width) ,
+		 top: this.props.heightTop + this.props.padding, width: 20,height:20, 
 		borderWidth: 0, justifyContent: "center", alignItems: "center"}}
 	
 	source={{

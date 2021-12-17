@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { StyleSheet, Dimensions, StatusBar,Text, Button } from "react-native";
 import { GameLoop } from "react-native-game-engine";
-import Worm from "./worm";
+import PuzzlePanel from "./puzzlePanel";
 import NextButton from "./nextButton";
 import { LinearGradient } from "expo-linear-gradient";
 
@@ -51,8 +51,8 @@ export default class SingleTouch extends Component {
     if (move) {
 
       this.setState({
-        x: Math.min(WIDTH,Math.max(0,this.state.x + move.delta.pageX)),
-        y: Math.min(HEIGHT,Math.max(0,this.state.y + move.delta.pageY))
+        x: Math.min(WIDTH,Math.max(0,this.state.x + 2 * move.delta.pageX)),
+        y: Math.min(HEIGHT,Math.max(0,this.state.y + 2 * move.delta.pageY))
       });
     }
   };
@@ -63,14 +63,28 @@ export default class SingleTouch extends Component {
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
 
+    if (this.state.success || this.state.failure){
+      console.log(this.state.success);
+      console.log(this.state.failure);
+      this.state.movement.pop();
+      this.setState ({
+        x: this.state.movement[this.state.movement.length-1][0],
+        y: this.state.movement[this.state.movement.length-1][1],
+        failure : false,
+        success: false,
+      })
+      return;
+    }
+
     //check if snake dies
     
     let alreadyTraversedVal = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
 
     //check if player reached the "end"
-    if (Math.ceil(val[0]) >= WIDTH- this.state.padding && val[1] <= this.state.heightTop + this.state.padding && !this.props.success && !this.props.failure){
+    if (Math.ceil(val[0]) >= WIDTH- this.state.padding && val[1] <= this.state.heightTop + this.state.padding){
       this.state.movement.push(val);
       this.evaluateRoute();
+      return;
     }
     else{
       this.setState({success: false, failure: false})
@@ -82,12 +96,11 @@ export default class SingleTouch extends Component {
 				this.state.movement.pop();
 		}
 
-
+    //check if player is travelling to a path already travelled
     else if(alreadyTraversedVal){
           this.setState ({
-            x: 0,
-            y: this.yStart,
-            movement: []
+            x: this.state.movement[this.state.movement.length-1][0],
+            y: this.state.movement[this.state.movement.length-1][1],
           })
     }
     else{
@@ -127,6 +140,9 @@ export default class SingleTouch extends Component {
 
     if (constraintCheck){
       this.setState({success:true})
+    }
+    else{
+      this.setState({failure:true})
     }
   })
 
@@ -394,7 +410,7 @@ createGrid(state){
       colors={["#E96443", "#904E95"]}
       style={{flex:1, zIndex:-4}}
     > */}
-        <Worm key={this.props.level.name} 
+        <PuzzlePanel key={this.props.level.name} 
         {...this.state} 
         loadNext = {this.props.loadNext} 
         level = {this.props.level}
