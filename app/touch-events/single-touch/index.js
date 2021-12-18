@@ -36,9 +36,9 @@ export default class SingleTouch extends Component {
 			renderComplete: false,
       success : false,
       failure : false,
-      heightTop : Math.ceil(HEIGHT/2 - WIDTH/2 - padding)
+      heightTop : Math.ceil(HEIGHT/2 - WIDTH/2 - padding),
+      gaps : [],
     };
-    console.log( WIDTH- this.state.padding,  this.state.heightTop)
     this.createGrid(this.state);
   }
 
@@ -63,6 +63,9 @@ export default class SingleTouch extends Component {
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
 
+    let currentLocation = this.state.movement[this.state.movement.length-1];
+ 
+    //check final state
     if (this.state.success || this.state.failure){
       console.log(this.state.success);
       console.log(this.state.failure);
@@ -77,11 +80,37 @@ export default class SingleTouch extends Component {
     }
 
     //check if snake dies
-    
-    let alreadyTraversedVal = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
 
+    let invalidMovement = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
+
+
+    if (currentLocation){
+      //check if player tried to go onto a gap
+  
+      //yGap
+      let yGaps = this.state.gaps.filter((ele) => ele[0] == val[0]);
+      let xGaps = this.state.gaps.filter((ele) => ele[1] == val[1]);
+      if (yGaps.length > 0){
+        invalidMovement = yGaps.reduce((prev,current) => {
+  
+          return prev || ( ((current[1] > currentLocation[1] && current[1] < val[1]) || (current[1] > val[1] && current[1] < currentLocation[1])));
+        },invalidMovement)
+      }
+      //xGap
+      if (xGaps.length > 0){
+        invalidMovement = xGaps.reduce((prev,current) => {
+  
+          return prev || ( ((current[0] > currentLocation[0] && current[0] < val[0]) || (current[0] > val[0] && current[0] < currentLocation[0])));
+        },invalidMovement)
+        // console.log((xGap[0] > previousX && xGap[0] < val[0]) || (xGap[0] > val[0] && xGap[0] < previousX))
+        // invalidMovement = invalidMovement || ((xGap[0] > previousX && xGap[0] < val[0]) || (xGap[0] > val[0] && xGap[0] < previousX));
+      }
+
+    }
     //check if player reached the "end"
-    if (Math.ceil(val[0]) >= WIDTH- this.state.padding && val[1] <= this.state.heightTop + this.state.padding){
+
+    // console.log(WIDTH- this.state.padding ,this.state.heightTop + this.state.padding)
+    if (Math.ceil(val[0]) >= this.state.validPathsX[this.state.validPathsX.length - 1] && val[1] <= this.state.validPathsY[0]){
       this.state.movement.push(val);
       this.evaluateRoute();
       return;
@@ -90,6 +119,10 @@ export default class SingleTouch extends Component {
       this.setState({success: false, failure: false})
     }
 
+
+  
+
+
 		//check if player reversed route ! 
 
 		if (previousX == val[0] && previousY == val[1]){
@@ -97,10 +130,12 @@ export default class SingleTouch extends Component {
 		}
 
     //check if player is travelling to a path already travelled
-    else if(alreadyTraversedVal){
+    else if(invalidMovement){
+      console.log("INVALID MOVMEENT")
+      console.log(val[0],val[1])
           this.setState ({
-            x: this.state.movement[this.state.movement.length-1][0],
-            y: this.state.movement[this.state.movement.length-1][1],
+            x: currentLocation[0],
+            y: currentLocation[1],
           })
     }
     else{
@@ -228,7 +263,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
         yCoordOfPath = currentY - this.state.padding;
       yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
       xCoordOfPathEnd = xCoordOfPath; 
-      hitEdge  = currentX + this.state.width + this.state.padding >= WIDTH ;
+      hitEdge  = currentX + this.state.width + this.state.padding >= this.state.validPathsX[this.state.validPathsX.length - 1] ;
       nextX = currentX + this.state.padding + this.state.width;
       nextY = currentY;
       break;
@@ -370,19 +405,43 @@ createGrid(state){
     //row reset
     xPointer = padding;
     for (let j = 0; j < this.props.level.columns; j++){
+
+      if (this.props.level.yGaps && this.props.level.yGaps.some((ele) => ele.x == j && ele.y == i)){
+        this.state.gaps.push([xPointer -padding ,yPointer + (this.state.height ) / 2])
+      }
+      if (this.props.level.xGaps && this.props.level.xGaps.some((ele) => ele.x == j && ele.y == i)){
+        this.state.gaps.push([xPointer + (this.state.width) / 2 ,yPointer - this.state.padding])
+      }
+
+
       let newGrid = {};
       newGrid.x = xPointer;
       newGrid.y = yPointer;
       newGrid.width = this.state.width;
       newGrid.height = this.state.height;
       gridLocations.push(newGrid);
-
       xPointer += this.state.width + padding;
+      
+
+  
     }
-    
+
+      if (this.props.level.yGaps && this.props.level.yGaps.some((ele) => ele.x == this.props.level.columns && ele.y == i)){
+        console.log("here")
+    this.state.gaps.push([xPointer -this.state.padding ,yPointer + (this.state.height ) / 2])
+  }
+        
     validPathsY.push(yPointer + this.state.width);
     yPointer += this.state.width + padding;
   }
+
+
+  if (this.props.level.xGaps && this.props.level.xGaps.some((ele) => ele.y == this.props.level.rows)){
+    console.log("check")
+    this.state.gaps.push([(padding + (this.state.width + padding ) * (0 + this.props.level.xGaps.find((ele) => ele.y == this.props.level.rows).x)) + ((this.state.width) / 2) ,yPointer - this.state.padding])
+  }
+
+  console.log(this.state.gaps)
   //POPULATE VALID PATHS X
   let validPathPtr = padding;
   for (let j = 0; j < this.props.level.columns; j++){
@@ -392,7 +451,7 @@ createGrid(state){
 
   state.validPathsX = validPathsX;
   state.validPathsY = validPathsY;
-  console.log(validPathsX,validPathsY);
+  // console.log(validPathsX,validPathsY);
   
    state.gridLocations = gridLocations;
 

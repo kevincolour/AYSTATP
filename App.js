@@ -4,8 +4,6 @@ import CloseButton from "./app/table-of-contents/closeButton";
 import EStyleSheet from "react-native-extended-stylesheet";
 
 import TableOfContents from "./app/table-of-contents";
-import TouchChapter from "./app/touch-events";
-
 EStyleSheet.build();
 
 //-- There is a bunch of warnings about the use of deprecated lifecycle methods. A lot of them are caused
@@ -44,7 +42,6 @@ export default class App extends Component {
           contents={{
             heading: "AYSTATP",
             items: [
-              TouchChapter(this.mountScene),
             ]
           }}
         />

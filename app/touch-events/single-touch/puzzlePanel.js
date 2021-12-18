@@ -123,7 +123,17 @@ export default class PuzzlePanel extends Component {
 
 			gridWithPieces.push(square);
 		})
-		
+		const gaps = [];
+		const paths = this.props.validPathsX;
+		this.props.gaps.forEach((ele,ind)=>{
+			let isYGap = paths.some((path) => path == ele[0]);
+			let  gap = <View style ={{position:"absolute", backgroundColor: "red", width:20, height:20,
+				left:ele[0] - (isYGap ? 0 : 10) ,top: ele[1] - (isYGap ? 10 : 0)
+		}}>
+
+		</View>
+			gaps.push(gap);
+		})
 		const winImage = 		<Image style ={{position: "absolute",left: (this.props.padding * (this.props.validPathsX.length - 1) + (this.props.validPathsX.length - 1)* this.props.width) ,
 		 top: this.props.heightTop + this.props.padding, width: 20,height:20, 
 		borderWidth: 0, justifyContent: "center", alignItems: "center"}}
@@ -182,6 +192,7 @@ export default class PuzzlePanel extends Component {
 			{gridWithPieces}
 
 			{viewPath}
+			{gaps}
 			{winImage}
 		<View >
 

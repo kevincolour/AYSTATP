@@ -5,7 +5,8 @@ import EStyleSheet from "react-native-extended-stylesheet";
 
 import TableOfContents from "./app/table-of-contents";
 import SingleTouch from "./app/touch-events/single-touch";
-import {tetrisObjects} from "./app/TetrisObjects"
+import {levels} from "./app/definitions/tetrisLevels";
+
 EStyleSheet.build();
 
 
@@ -15,94 +16,12 @@ console.disableYellowBox = true;
 
 
 
-const levelPrologue = {
-  name: "levelPrologue",
-  rows : 1,
-  columns : 1,
-  tetrisPieces : [{
-    ...tetrisObjects.singlePiece,
-    location:
-    {
-      index: 0
-    },
-  }]
-}
-const level1 = {
-  name: "level1",
-  rows : 4,
-  columns : 4,
-  tetrisPieces : [{
-    ...tetrisObjects.tPiece,
-    location:
-    {
-      index: 10
-    },
-  }]
-}
-
-const level2 = {
-  name: "squarePiece",
-  rows : 3,
-  columns : 3,
-  tetrisPieces : [{
-    ...tetrisObjects.twoPiece,
-    location:{
-      index: 4
-    }
-  }]
-}
-
-const level3 = {
-  name: "squarePiece",
-  rows : 3,
-  columns : 3,
-  tetrisPieces : [{
-    ...tetrisObjects.squarePiece,
-    location:{
-      index: 0
-    }
-  }]
-}
-const level4 = {
-  name: "lPiece",
-  rows : 3,
-  columns : 3,
-  tetrisPieces : [{
-    ...tetrisObjects.lPiece,
-    location:{
-      index: 1
-    }
-  }]
-}
-
-const level5 = {
-  name: "squarePiece",
-  rows : 3,
-  columns : 3,
-  tetrisPieces : [{
-    ...tetrisObjects.twoPieceVertical,
-    location:{
-      index: 2
-    }
-  }]
-}
-
-const level6 = {
-  name: "squarePiece",
-  rows : 3,
-  columns : 1,
-  tetrisPieces : []
-}
-
-const levels = [levelPrologue,level1,level2,level3,level4, level5, level6];
-
-
 export default class App extends Component {
   constructor(props) {
 
     super(props);
     this.state = {
-      currentLevelIndex: 0,
+      currentLevelIndex: 6,
       sceneVisible: false,
       scene: null
     };

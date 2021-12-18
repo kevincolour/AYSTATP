@@ -1,14 +1,14 @@
 export const tetrisObjects = {
 
     singlePiece : {
-        img: require("../assets/Tetris/TetrisPieceSingle.png"),
+        img: require("../../assets/Tetris/TetrisPieceSingle.png"),
         tetrisBlocks :
         {
             noChild :true 
         },
     },
     tPiece: {
-        img: require("../assets/Tetris/TetrisPiece1.png"),
+        img: require("../../assets/Tetris/TetrisPiece1.png"),
   
         tetrisBlocks :
         {
@@ -20,7 +20,7 @@ export const tetrisObjects = {
         },
     },
     lPiece: {
-        img: require("../assets/Tetris/TetrisPieceL.png"),
+        img: require("../../assets/Tetris/TetrisPieceL.png"),
   
         tetrisBlocks :
         {
@@ -34,7 +34,7 @@ export const tetrisObjects = {
         },
     },
     twoPiece: {
-        img: require("../assets/Tetris/TetrisPieceDouble.png"),
+        img: require("../../assets/Tetris/TetrisPieceDouble.png"),
   
         tetrisBlocks :
         {
@@ -44,7 +44,7 @@ export const tetrisObjects = {
         },
     },
     twoPieceVertical: {
-        img: require("../assets/Tetris/TetrisPieceDouble.png"),
+        img: require("../../assets/Tetris/TetrisPieceDouble.png"),
   
         tetrisBlocks :
         {
@@ -54,7 +54,7 @@ export const tetrisObjects = {
         },
     },
     squarePiece: {
-        img: require("../assets/Tetris/TetrisPieceSquare.png"),
+        img: require("../../assets/Tetris/TetrisPieceSquare.png"),
         name: "Square",
         tetrisBlocks :
         {
