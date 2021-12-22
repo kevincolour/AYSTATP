@@ -92,28 +92,99 @@ const levelPrologue = {
           index: 1
         }
       }
-    ]
+      
+    ],
+    yGaps : [{x:0,y:2},{x:1,y:1}],
+
       
   }
 
   const level7 = {
     name: "squarePiece",
-    rows : 5,
-    columns : 5,
+    rows : 3,
+    columns : 1,
     tetrisPieces : [{
         ...tetrisObjects.singlePiece,
         location:{
           index: 2
         }
-      }],
-    xGaps :[{
-        x:1,
-        y:1
-    }],
-    yGaps : [{x:2,y:0}]
+      },
+      {
+        ...tetrisObjects.singlePiece,
+        location:{
+          index: 1
+        }
+      }
+      
+    ],
+    xGaps : [{x:0,y:2}],
+
+      
+  }
+  const level8 = {
+    name: "squarePiece",
+    rows : 3,
+    columns : 2,
+    tetrisPieces : [{
+        ...tetrisObjects.tPiece,
+        location:{
+          index: 2
+        }
+      },
+      {
+        ...tetrisObjects.singlePiece,
+        location:{
+          index: 3
+        }
+      }
+      
+    ],
+      
+  }
+  const level9 = {
+    name: "squarePiece",
+    rows : 3,
+    columns : 3,
+    tetrisPieces : [
+      {
+        ...tetrisObjects.squarePiece,
+        location:{
+          index: 6
+        }
+      },
+      {
+        ...tetrisObjects.twoPiece,
+        location:{
+          index: 1
+        }
+      }
+      
+    ],
+      
+  }
+  const level10 = {
+    name: "squarePiece",
+    rows : 3,
+    columns : 3,
+    tetrisPieces : [
+      {
+        ...tetrisObjects.squarePiece,
+        location:{
+          index: 6
+        }
+      },
+      {
+        ...tetrisObjects.twoPiece,
+        location:{
+          index: 7
+        }
+      }
+      
+    ],
+      
   }
 
   
- export const levels = [levelPrologue,level1,level2,level3,level4, level5, level6, level7];
+ export const levels = [levelPrologue,level1,level2,level3,level4, level5, level6, level7,level8,level9,level10];
   
 
