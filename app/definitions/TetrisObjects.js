@@ -34,12 +34,50 @@ export const tetrisObjects = {
         },
     },
     twoPiece: {
-        img: require("../../assets/Tetris/TetrisPieceDouble.png"),
+        img: require("../../assets/Tetris/TetrisPieceHorizontalDouble.png"),
   
         tetrisBlocks :
         {
             childRight : {
               noChild :true 
+            },
+        },
+    },
+    threePiece: {
+        img: require("../../assets/Tetris/TetrisPieceHorizontalThree.png"),
+  
+        tetrisBlocks :
+        {
+            childRight : {
+                childRight : {
+                    noChild :true 
+                  },
+            },
+        },
+    },
+    threePieceVertical: {
+        img: require("../../assets/Tetris/TetrisPieceVerticalThree.png"),
+  
+        tetrisBlocks :
+        {
+            childDown : {
+                childDown : {
+                    noChild :true 
+                  },
+            },
+        },
+    },
+    fourPiece: {
+        img: require("../../assets/Tetris/TetrisPieceHorizontalFour.png"),
+  
+        tetrisBlocks :
+        {
+            childRight : {
+                childRight : {
+                    childRight : {
+                        noChild :true 
+                      }, 
+                  },
             },
         },
     },

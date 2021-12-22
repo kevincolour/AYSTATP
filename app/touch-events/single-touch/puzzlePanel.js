@@ -135,7 +135,7 @@ export default class PuzzlePanel extends Component {
 			gaps.push(gap);
 		})
 		const winImage = 		<Image style ={{position: "absolute",left: (this.props.padding * (this.props.validPathsX.length - 1) + (this.props.validPathsX.length - 1)* this.props.width) ,
-		 top: this.props.heightTop + this.props.padding, width: 20,height:20, 
+		 top: this.props.offset, width: 20,height:20, 
 		borderWidth: 0, justifyContent: "center", alignItems: "center"}}
 	
 	source={{

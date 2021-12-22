@@ -13,10 +13,12 @@ export default class SingleTouch extends Component {
     super(props);
     const padding = 20;
 		this.n = Math.max(this.props.level.columns, this.props.level.rows);
-    this.yStart = (HEIGHT/2 + WIDTH/2) - padding;
-
+    
     const width = Math.ceil((WIDTH- (padding*(this.n +1))) / this.n);
     const height = width;
+    const offset = Math.ceil(HEIGHT/2 - (height + padding) * this.props.level.rows / 2);
+    this.yStart =  offset + (height + padding) * this.props.level.rows;
+
 
 
     this.state = {
@@ -33,8 +35,9 @@ export default class SingleTouch extends Component {
 			renderComplete: false,
       success : false,
       failure : false,
-      heightTop : Math.ceil(HEIGHT/2 - WIDTH/2 - padding),
+      heightTop : Math.ceil(offset),
       gaps : [],
+      offset: offset
     };
     this.createGrid(this.state);
   }
@@ -211,21 +214,28 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
     console.log(JSON.stringify(currentPossibleStarts));
     let x = currentPossibleStarts[0][0];
     let y = currentPossibleStarts[0][1];
-
+    let occupiedSquares = [];
     let outOfBounds =  x >= WIDTH ||x <= 0 || y <= this.state.heightTop || y >=  this.state.heightTop + WIDTH ; 
+    if (outOfBounds){
+      console.log("OUT OF BOUNDS")
+      currentPossibleStarts.shift();
+      continue;
+    }
     
-    this.checkTetrisConstraint(tetrisPiece, tetrisPiece.tetrisBlocks, "", x, y, currentPossibleStarts,visited, [], needsAMatch)
-    validBool = validBool || (!outOfBounds)
+    validBool = this.checkTetrisConstraint(tetrisPiece, tetrisPiece.tetrisBlocks, "", x, y, currentPossibleStarts,visited, occupiedSquares , needsAMatch)
     
     
-      if (remainingBlocks.length > 0){
+    
+      if (remainingBlocks.length > 0 && validBool){
         console.log("REMAINING BLOCKS")
     console.log(remainingBlocks);
         let tmp = remainingBlocks[0];
         let currentBox = this.state.gridLocations[tmp.location.index];
         let visited = [];
         let remainingBlocksNew = remainingBlocks.slice(1);
-        validBool = validBool && this.checkAllPossibleStarting(tmp,[[currentBox.x,currentBox.y]],visited,remainingBlocksNew,needsAMatch)
+        let newCurrentPossible = currentPossibleStarts.slice();
+        newCurrentPossible.push([currentBox.x,currentBox.y]);
+        validBool = validBool && this.checkAllPossibleStarting(tmp,newCurrentPossible,visited,remainingBlocksNew,needsAMatch)
       }
       else{
         if (needsAMatch.length == 0 && validBool){
@@ -233,7 +243,7 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
           return true;
         }
         else{
-          console.log("(LAST PIECE AND MATCH LEFt)")
+          console.log("(MATCH LEFt)")
           validBool = false;
         }
       }
@@ -283,7 +293,9 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
         yCoordOfPath = currentY + this.state.width;
       yCoordOfPathEnd = yCoordOfPath;
       xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
-      hitEdge  = currentY + this.state.width + this.state.padding >= this.state.heightTop + WIDTH ;
+      hitEdge  = currentY + this.state.width + this.state.padding >= this.state.heightTop + (this.state.height + this.state.padding) * this.props.level.rows;
+
+
       nextX = currentX;
       nextY = currentY + this.state.padding + this.state.width;
 
@@ -340,6 +352,11 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
     )
    ) 
   );
+  if (hitEdge){
+    console.log("hit edge, exit true")
+    return true;
+  }
+
   let foundOccupied = (occupiedSquares.some((ele) => ele[0] == nextX && ele[1] == nextY));
   if (nextBlock){
     // eventually want to make more possible starts (in the case next block is somewhere we would like to start at some point) 
@@ -363,7 +380,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
     }
 
     //need to be either the border, or the edge of screen
-    if ((!(hitEdge || borderCondition)))
+    if ((!(borderCondition)))
     {
       //one of the conditions above was true, puzzle failed
 
@@ -474,19 +491,18 @@ createGrid(state){
   //array of xstart,xend,ystart,yend
   const gridLocations = [];
 
-  const offset = Math.ceil(HEIGHT/2 - WIDTH / 2);
   const validPathsX = [0];
 
-  const validPathsY = [];
-  validPathsY.push(offset)
+
 
   const padding = this.state.padding;
   let xPointer = padding ;
 
-
+  const validPathsY = [];
+  validPathsY.push(this.state.offset)
   //try and center the grid
   // let topOffset = HEIGHT/ 2 - WIDTH /2;
-  let yPointer = padding + offset;
+  let yPointer = padding + this.state.offset;
   for (let i = 0; i < this.props.level.rows; i++){
     //row reset
     xPointer = padding;
