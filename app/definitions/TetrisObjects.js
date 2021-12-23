@@ -33,6 +33,20 @@ export const tetrisObjects = {
            }
         },
     },
+    lPieceLeft: {
+        img: require("../../assets/Tetris/TetrisPieceLLeft.png"),
+  
+        tetrisBlocks :
+        {
+          childRight: {
+            childRight : {
+                childDown : {
+                    noChild :true 
+                }
+            },
+           }
+        },
+    },
     twoPiece: {
         img: require("../../assets/Tetris/TetrisPieceHorizontalDouble.png"),
   
@@ -63,6 +77,20 @@ export const tetrisObjects = {
             childDown : {
                 childDown : {
                     noChild :true 
+                  },
+            },
+        },
+    },
+    fourPieceVertical: {
+        img: require("../../assets/Tetris/TetrisPieceVerticalFour.png"),
+  
+        tetrisBlocks :
+        {
+            childDown : {
+                childDown : {
+                    childDown : {
+                        noChild :true 
+                      },
                   },
             },
         },

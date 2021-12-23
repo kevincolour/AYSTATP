@@ -261,10 +261,99 @@ const levelPrologue = {
     yGaps : [{x:3,y:1}]
       
   }
+  const level14 = {
+    name: "squarePiece",
+    rows : 4,
+    columns : 4,
+    tetrisPieces : [
+      {
+        ...tetrisObjects.threePieceVertical,
+        location:{
+          index: 13
+        }
+      },
+      {
+        ...tetrisObjects.threePieceVertical,
+        location:{
+          index: 14
+        }
+      },
+      {
+        ...tetrisObjects.fourPiece,
+        location:{
+          index: 4
+        }
+      }
+      
+    ],
+    yGaps : [{x:2,y:1}]
+      
+  }
+
+  const level15 = {
+    name: "squarePiece",
+    rows : 5,
+    columns : 5,
+    tetrisPieces : [
+      {
+        ...tetrisObjects.fourPieceVertical,
+        location:{
+          index: 4
+        }
+      },
+      {
+        ...tetrisObjects.singlePiece,
+        location:{
+          index: 12
+        }
+      },
+      {
+        ...tetrisObjects.twoPiece,
+        location:{
+          index: 22
+        }
+      }
+      
+    ],
+      
+  }
+  const level16 = {
+    name: "squarePiece",
+    rows : 5,
+    columns : 5,
+    tetrisPieces : [
+      {
+        ...tetrisObjects.lPieceLeft,
+        location:{
+          index: 0
+        }
+      },
+      {
+        ...tetrisObjects.twoPiece,
+        location:{
+          index: 4
+        }
+      },
+      {
+        ...tetrisObjects.threePieceVertical,
+        location:{
+          index: 21
+        }
+      },
+      {
+        ...tetrisObjects.threePiece,
+        location:{
+          index: 24
+        }
+      }
+      
+    ],
+      
+  }
 
   
  export const levels = [levelPrologue,level1,level2,level3,level4, 
-  level5, level6, level7,level8,level9,level10,level11,level12,level13];
+  level5, level6, level7,level8,level9,level10,level11,level12,level13,level14,level15,level16];
 
   export const levelPhase2 = [];
   levels.concat(levelPhase2);
