@@ -1,8 +1,7 @@
 import React, { PureComponent,Component } from "react";
 import { StyleSheet, View, Dimensions ,Image, Text,Pressable	} from "react-native";
 import { StaggeredMotion, spring } from "react-motion";
-import {SimpleGrid} from "./renderers"
-import Matter from "matter-js";
+import WinImageObject from "../../definitions/assetObjects"
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
@@ -59,6 +58,9 @@ export default class PuzzlePanel extends Component {
 			this.props.trackMovementFunc(newCoordArray);
 		}
 
+
+		let overlap = 1;
+		let paddingWithOverlap = padding + overlap * 2;
 		//populate the path taken so far in a list of views
 		const viewPath = [];
 		let index = 1; 
@@ -68,16 +70,18 @@ export default class PuzzlePanel extends Component {
 				let prevPath = this.props.movement[index-1];
 				let horizontalDifference = path[0] - prevPath[0] ;
 				let verticalDifference = path[1] -prevPath[1];
-				let overlap = 1;
-				let paddingWithOverlap = padding + overlap * 2;
+
+
+
 				let pathStyle = {
 					position: "absolute", left: path[0] - overlap, top: path[1] -overlap, backgroundColor: "blue", zIndex: -1, 
 				}
 
+			
 				//I went up.
 				if (verticalDifference < 0){
 					pathStyle.width = paddingWithOverlap ;
-					pathStyle.height = Math.abs(verticalDifference);
+					pathStyle.height = Math.abs(verticalDifference) + paddingWithOverlap;
 				}
 				
 				//I went down
@@ -103,6 +107,22 @@ export default class PuzzlePanel extends Component {
 			}
 		}
 
+		
+		// let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
+		// let pathStyle = {
+		// 	position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
+		// }
+		// //populate line so far
+		// //going up
+		// // console.log(lastSeenY, this.props.y);
+		// if (lastSeenY > this.props.y){
+		// 	// console.log("here")
+		// 	pathStyle.top = this.props.y;
+		// 	pathStyle.height = lastSeenY - this.props.y + this.props.padding;
+		// }
+		// const lineProgress = <View style ={pathStyle}></View>
+
+
 		const gridWithPieces = [];
 		const gameObj = this;
 		this.props.gridLocations.forEach(function(ele,ind){
@@ -127,21 +147,15 @@ export default class PuzzlePanel extends Component {
 		const paths = this.props.validPathsX;
 		this.props.gaps.forEach((ele,ind)=>{
 			let isYGap = paths.some((path) => path == ele[0]);
-			let  gap = <View style ={{position:"absolute", backgroundColor: "red", width:20, height:20,
+			let  gap = <View key = {ind} style ={{position:"absolute", backgroundColor: "red", width:20, height:20,
 				left:ele[0] - (isYGap ? 0 : 10) ,top: ele[1] - (isYGap ? 10 : 0)
 		}}>
 
 		</View>
 			gaps.push(gap);
 		})
-		const winImage = 		<Image style ={{position: "absolute",left: (this.props.padding * (this.props.validPathsX.length - 1) + (this.props.validPathsX.length - 1)* this.props.width) ,
-		 top: this.props.offset, width: 20,height:20, 
-		borderWidth: 0, justifyContent: "center", alignItems: "center"}}
-	
-	source={{
-	  uri: 'https://www.seekpng.com/png/detail/24-243121_apple-png-apple-clipart.png',
-	}}
-	  />;
+		const winImage = <WinImageObject {...this.props}/>
+	  
 		return (
 			<>
 			{(this.props.success && <View style = {{position:"absolute", top:50,left:WIDTH-100, width:200,height:200}}>
@@ -190,8 +204,8 @@ export default class PuzzlePanel extends Component {
 </View>)}
 
 			{gridWithPieces}
-
-			{viewPath}
+			{lineProgress}
+			{/* {viewPath} */}
 			{gaps}
 			{winImage}
 		<View >
@@ -199,9 +213,7 @@ export default class PuzzlePanel extends Component {
 		</View>
 		  {/* <View style = {{position: "absolute", left: lastKnownX, top: lastKnownY, width:200, height:200, backgroundColor: "blue" }}></View> */}
 			<View>
-
-
-				<StaggeredMotion
+			<StaggeredMotion
 					defaultStyles={[
 						{ left: this.props.x, top: this.props.y },
 						{ left: this.props.x, top: this.props.y },
@@ -245,9 +257,8 @@ export default class PuzzlePanel extends Component {
 						</View>
 					)}
 				</StaggeredMotion>
-
 				<View style={[css.head, { left: this.props.x, top: this.props.y }]} />
-				<View style={[css.lead, { left: closestX, top: closestY}]} />
+				{/* <View style={[css.lead, { left: closestX, top: closestY}]} /> */}
 				
 			</View>
 			</>
@@ -302,9 +313,9 @@ const css = StyleSheet.create({
 	},
 	lead: {
 		opacity: 1,
-		backgroundColor: "yellow",
-		borderColor: "#FFC1C1",
-		borderWidth: BORDER_WIDTH,
+		backgroundColor: "red",
+		borderColor: "blue",
+		borderWidth: BORDER_WIDTH ,
 		width: BODY_DIAMETER ,
 		height: BODY_DIAMETER ,
 		position: "absolute",
