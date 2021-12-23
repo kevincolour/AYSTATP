@@ -52,85 +52,13 @@ export default class SingleTouch extends Component {
 
   onUpdate = ({ touches }) => {
     let move = touches.find(x => x.type === "move");
-    const forgive = this.state.width / 3;
-    const slack = 15;
+   
     if (move) {
 
       
       let newX =(Math.min(this.state.fullWidth,Math.max(0,this.state.x +  move.delta.pageX))); 
       let newY =(Math.min(this.state.fullHeight + this.state.offset,Math.max(this.state.offset,this.state.y +  move.delta.pageY))); 
       
-     
-      
-        console.log(newX,newY)
-        console.log("validPathX",JSON.stringify(this.state.validPathsX))
-        console.log("validPAthY" , JSON.stringify(this.state.validPathsY))
-
-      //on an X path, stifle Y movement
-      // if (this.state.validPathsx.some((ele)=> ele == newY)){
-      //   var closestY = this.state.validPathsY.reduce(function(prev, curr) {
-      //     return (Math.abs(curr - newY) < Math.abs(prev - newY) ? curr : prev);
-      //   });
-      //   newY = closestY
-      // }
-      let restrictedX = newX;
-      if (this.state.validPathsX.some((ele) => ele - forgive < newX && newX < ele + forgive)){
-        var closestX = this.state.validPathsX.reduce(function(prev, curr) {
-          return (Math.abs(curr - newX) < Math.abs(prev - newX) ? curr : prev);
-        });
-
-        //check if intersection
-        if(this.state.validPathsY.some((ele) => ele - slack < newY && newY < ele + slack)){
-            //pass
-          }
-          else{
-            restrictedX = closestX
-          }
-        
-      }
-      newX= restrictedX
-
-      let restrictedY = newY;
-      if(this.state.validPathsY.some((ele) => ele - forgive < newY && newY < ele + forgive)){
-        var closestY = this.state.validPathsY.reduce(function(prev, curr) {
-          return (Math.abs(curr - newY) < Math.abs(prev - newY) ? curr : prev);
-        });
-
-                //check if intersection
-        if(this.state.validPathsX.some((ele) => ele - slack < newX && newX < ele + slack)){
-            //pass
-          }
-          else{
-            restrictedY = closestY
-          }
-      }
-
-      newY = restrictedY
-
-
-      // if(this.state.validPathsY.some((ele) => ele - slack < newY && newY < ele + slack)){
-      //   var closestY = this.state.validPathsY.reduce(function(prev, curr) {
-      //     return (Math.abs(curr - newY) < Math.abs(prev - newY) ? curr : prev);
-      //   });
-      //   restrictedY = closestY
-      // }
-
-      // if (newX - slack < restrictedX && newX + slack > restrictedX  && newY == restrictedY){
-      //   console.log("SAMSIES")
-      // }
-      // else{
-      //   newX = restrictedX
-      //   newY = restrictedY
-      // }
-
-
-
-
-      // var closestX = this.state.validPathsX.reduce(function(prev, curr) {
-      //   return (Math.abs(curr - newX) < Math.abs(prev - newXrr) ? curr : prev);
-      // });
-      // newX = closestX
-
       this.setState({
         x: newX,
         y: newY

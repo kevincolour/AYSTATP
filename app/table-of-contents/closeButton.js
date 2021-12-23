@@ -27,7 +27,7 @@ export default class CloseButton extends Component {
       >
         <Animatable.Image
           ref={"close"}
-          delay={500}
+          delay={1500}
           animation={"bounceIn"}
           source={Close}
         />

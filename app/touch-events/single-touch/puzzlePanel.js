@@ -1,7 +1,7 @@
 import React, { PureComponent,Component } from "react";
 import { StyleSheet, View, Dimensions ,Image, Text,Pressable	} from "react-native";
 import { StaggeredMotion, spring } from "react-motion";
-import WinImageObject from "../../definitions/assetObjects"
+import {WinImageObject,RedoImageObject,PreviousImageObject,NextImageObject} from "../../definitions/assetObjects"
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
@@ -155,58 +155,23 @@ export default class PuzzlePanel extends Component {
 			gaps.push(gap);
 		})
 		const winImage = <WinImageObject {...this.props}/>
+		const redoImage = <RedoImageObject {...this.props}/>
+		const previousImage = <PreviousImageObject {...this.props}/>
+		const nextImage = <NextImageObject {...this.props}/>
 	  
 		return (
 			<>
-			{(this.props.success && <View style = {{position:"absolute", top:50,left:WIDTH-100, width:200,height:200}}>
-
-			<Pressable
-				onPress={() => {
-					this.props.loadNext(1);
-				}}
-				style={({ pressed }) => [
-				{
-					backgroundColor: pressed
-					? 'rgb(210, 230, 255)'
-					: 'white'
-				},
-				styles.wrapperCustom
-				]}>
-				{({ pressed }) => (
-				<Text style={styles.text}>
-					{pressed ? 'Pressed!' : 'Next!'}
-				</Text>
-				)}
-      		</Pressable>
-			</View>)}
+			
 
 
-			{(<View style = {{position:"absolute", top: 50 ,left:20, width:200,height:200}}>
-
-<Pressable
-	onPress={() => {
-		this.props.loadNext(-1);
-	}}
-	style={({ pressed }) => [
-	{
-		backgroundColor: pressed
-		? 'rgb(210, 230, 255)'
-		: 'white'
-	},
-	styles.wrapperCustom
-	]}>
-	{({ pressed }) => (
-	<Text style={styles.text}>
-		{pressed ? 'Pressed!' : 'Previous'}
-	</Text>
-	)}
-  </Pressable>
-</View>)}
+		
 
 			{gridWithPieces}
-			{lineProgress}
-			{/* {viewPath} */}
+			{viewPath}
 			{gaps}
+			{nextImage}
+			{previousImage}
+			{redoImage}
 			{winImage}
 		<View >
 
