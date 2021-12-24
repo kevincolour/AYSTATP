@@ -23,8 +23,6 @@ export default class PuzzlePanel extends Component {
 
 	render() {
 
-	
-
 		const padding = this.props.padding;
 // var closestXY = validPaths.reduce(function(prev, curr) {
 		// 	var a = Math.hypot(prev[0]-goalX, prev[1]-goalY);
@@ -147,8 +145,8 @@ export default class PuzzlePanel extends Component {
 		const paths = this.props.validPathsX;
 		this.props.gaps.forEach((ele,ind)=>{
 			let isYGap = paths.some((path) => path == ele[0]);
-			let  gap = <View key = {ind} style ={{position:"absolute", backgroundColor: "red", width:20, height:20,
-				left:ele[0] - (isYGap ? 0 : 10) ,top: ele[1] - (isYGap ? 10 : 0)
+			let  gap = <View key = {ind} style ={{position:"absolute", backgroundColor: "white", width: (isYGap? this.props.padding : this.props.width /2),
+			 height:(isYGap? this.props.width /2:  this.props.padding ),	left:ele[0] - (isYGap ? 0 : (this.props.width /2) /2) ,top: ele[1] - (isYGap ? (this.props.width /2) /2 : 0)
 		}}>
 
 		</View>

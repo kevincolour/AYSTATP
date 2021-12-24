@@ -21,7 +21,7 @@ export default class App extends Component {
 
     super(props);
     this.state = {
-      currentLevelIndex: 9,
+      currentLevelIndex: 6,
       sceneVisible: false,
       scene: null
     };
@@ -75,7 +75,7 @@ export default class App extends Component {
             items: [
               {
                 heading: "Play",
-                onPress: _ => this.mountScene(<SingleTouch loadNext = {this.nextLevelLoad} level = {levels[this.state.currentLevelIndex]} triggerVictory = {this.triggerVictory}/>)
+                onPress: _ => this.mountScene(<SingleTouch unmount = {this.unMountScene} loadNext = {this.nextLevelLoad} level = {levels[this.state.currentLevelIndex]} triggerVictory = {this.triggerVictory}/>)
               },
               {
                 heading: "Levels",

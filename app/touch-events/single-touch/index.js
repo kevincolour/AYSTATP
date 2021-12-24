@@ -4,6 +4,7 @@ import { GameLoop } from "react-native-game-engine";
 import PuzzlePanel from "./puzzlePanel";
 import NextButton from "./nextButton";
 import { LinearGradient } from "expo-linear-gradient";
+import {ErrorBoundary} from 'react-error-boundary';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -41,7 +42,8 @@ export default class SingleTouch extends Component {
       gaps : [],
       offset: offset,
       fullHeight:fullHeight,
-      fullWidth: 0
+      fullWidth: 0,
+      error: false,
     };
     this.createGrid(this.state);
   }
@@ -65,7 +67,15 @@ export default class SingleTouch extends Component {
       });
     }
   };
-
+  clearMovement = () =>{
+    this.setState({
+      movement: [],
+      x : 0,
+      y : this.state.fullHeight + this.state.offset,
+      success: false,
+      failure:false,
+    })
+  }
 
   trackMovement = (val) => {
     //val is an intersection, can't touch intersection more than once
@@ -130,7 +140,7 @@ export default class SingleTouch extends Component {
 		//check if player reversed route ! 
 
 		if (previousX == val[0] && previousY == val[1]){
-				this.state.movement.pop();
+				this.setState({movement: this.state.movement.slice(0,this.state.movement.length - 1 - 1)})
 		}
 
     //check if player is travelling to a path already travelled
@@ -568,8 +578,7 @@ createGrid(state){
     }
 
       if (this.props.level.yGaps && this.props.level.yGaps.some((ele) => ele.x == this.props.level.columns && ele.y == i)){
-        console.log("here")
-    this.state.gaps.push([xPointer -this.state.padding ,yPointer + (this.state.height ) / 2])
+      this.state.gaps.push([xPointer -this.state.padding ,yPointer + (this.state.height ) / 2])
   }
         
     validPathsY.push(yPointer + this.state.width);
@@ -578,11 +587,9 @@ createGrid(state){
 
 
   if (this.props.level.xGaps && this.props.level.xGaps.some((ele) => ele.y == this.props.level.rows)){
-    console.log("check")
     this.state.gaps.push([(padding + (this.state.width + padding ) * (0 + this.props.level.xGaps.find((ele) => ele.y == this.props.level.rows).x)) + ((this.state.width) / 2) ,yPointer - this.state.padding])
   }
 
-  console.log(this.state.gaps)
   //POPULATE VALID PATHS X
   let validPathPtr = padding;
   for (let j = 0; j < this.props.level.columns; j++){
@@ -600,34 +607,36 @@ createGrid(state){
 
 }
 
+ ErrorFallback({error, resetErrorBoundary}) {
+   resetErrorBoundary();
+   console.log(error);
+  return (
+    <View>
+    Whoops, triggered an error : Redirecting to the home screen. 
+    </View>
+  )
+}
   render() {
+
     return (
-    
-      <GameLoop style={styles.container} onUpdate={this.onUpdate}>
+    <ErrorBoundary FallbackComponent={this.ErrorFallback} rresetKeys = {Object.values(this.state)} onReset = {() => this.props.unmount()}>
 
+      {!this.state.error && <GameLoop style={styles.container} onUpdate={this.onUpdate}>
         <StatusBar hidden={true} />
-
-{/* 
-        <LinearGradient
-      colors={["#E96443", "#904E95"]}
-      style={{flex:1, zIndex:-4}}
-    > */}
       <View style = {{position:"absolute", top: this.state.heightTop, width: this.state.fullWidth + this.state.padding,
        height: this.state.fullHeight + this.state.padding, backgroundColor:"silver",zIndex:-1}}>
-
       </View>
 
         <PuzzlePanel key={this.props.level.name} 
         {...this.state} 
         loadNext = {this.props.loadNext} 
         level = {this.props.level}
+        clearMovement = {this.clearMovement}
         evaluateRoute = {this.evaluateRoute}
         setRenderComplete = {this.setRenderComplete}
         trackMovementFunc={this.trackMovement}/>
-      {/* </LinearGradient> */}
-        
-
-      </GameLoop>
+      </GameLoop>}
+    </ErrorBoundary>
      
     );
   }

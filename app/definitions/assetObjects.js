@@ -17,26 +17,43 @@ const WinImageObject = (props) => {
 }
 const RedoImageObject = (props) => {
 
-    const image= useRef();
-    return (
-        <TouchableOpacity
-        // style={}
-        hitSlop={{top: 10, left: 10, bottom: 10, right: 10, flex:1}}
-        activeOpacity={1}
-        onPress={()=>{image.bounceOut();console.log("here")}}
-      >
-        <Animatable.Image
-        ref={image}
-          delay={500}
-          animation={"bounceIn"}
-          style ={{position: "absolute",left: WIDTH/2 - imageOffset/2,
-		 top: props.offset - props.padding*3, width: imageOffset,height : imageOffset, 
-		borderWidth: 0, justifyContent: "center", alignItems: "center", zIndex: 10}}
-	
-	source={require("../../assets/redo-solid.png")}
-        />
-      </TouchableOpacity>
-  )
+  const image= useRef();
+  
+  const animateImage = () =>{
+
+      image.current.bounce(300);
+    }
+
+  return ( 
+    <View style = {{position: "absolute",left:WIDTH/2 - imageOffset/2,
+    top: props.offset - props.padding*3}}>
+
+  <Pressable
+    onPress={() => {
+      props.clearMovement();
+      animateImage();
+    }}
+    style={({ pressed }) => [
+    {
+      // backgroundColor: pressed
+      // ? 'rgb(210, 230, 255)'
+      // : 'white'
+    },
+    // styles.wrapperCustom
+    ]}>
+    {({ pressed }) => (
+                <Animatable.Image
+    ref={image}
+      delay={500}
+      animation={"bounceIn"}
+      style={{ width: imageOffset,height : imageOffset}}
+
+source={require("../../assets/redo-solid.png")}
+    />
+    )}
+      </Pressable>
+  </View>
+)
 
     
 }
