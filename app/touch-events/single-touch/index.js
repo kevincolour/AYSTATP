@@ -188,6 +188,10 @@ export default class SingleTouch extends Component {
       let currentBox = this.state.gridLocations[ele.location.index];
       let visited = [];
       let remainingBlocks = this.props.level.tetrisPieces.slice(1);
+
+      if (debug){
+        console.log("COMMENCING CHECKING OF TETRIS RULES \n\n\n\n")
+      }
       let constraintCheck = this.checkAllPossibleStarting(ele,  [[currentBox.x, currentBox.y]],visited,remainingBlocks,[],[]);
       
       if (debug){
@@ -232,6 +236,15 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
     }
     let x = currentPossibleStarts[0][0];
     let y = currentPossibleStarts[0][1];
+
+    if (occupiedSquares.some((ele) => ele[0] == x && ele[1] == y)){
+        if (debug){
+          console.log("OCCUPIED")
+        }
+      currentPossibleStarts.shift();
+      continue;
+    }
+
     let outOfBounds =  x >= WIDTH ||x <= 0 || y <= this.state.heightTop || y >=  this.state.heightTop + WIDTH ; 
     if (outOfBounds){
       if (debug){
@@ -256,8 +269,9 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
         let remainingBlocksNew = remainingBlocks.slice(1);
         let newCurrentPossible = currentPossibleStarts.slice();
         // let newCurrentPossible = [];
-
-        newCurrentPossible.push([currentBox.x,currentBox.y]);
+        if (!newCurrentPossible.some((ele => ele[0] == currentBox.x && ele[1] == currentBox.y))){
+          newCurrentPossible.push([currentBox.x,currentBox.y]);
+        }
         validBool = validBool && this.checkAllPossibleStarting(tmp,newCurrentPossible,visited,remainingBlocksNew,needsAMatch,[[x,y]])
       }
       else{
@@ -267,7 +281,7 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
             console.log("FOUND ANSWER (LAST PIECE AND NO MATCH LEFt)")
           }
           currentPossibleStarts.length = 0;
-          return true;
+          // return true;
         }
         else{
           if (debug){
@@ -292,8 +306,9 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
   let originalX = tetrisPiece.location.index % this.props.level.columns;
   let originalY = Math.floor(tetrisPiece.location.index / this.props.level.rows);
 
-  // console.log(originalX,originalY);
-  // console.log(JSON.stringify(occupiedSquares))
+  console.log("TEST")
+  console.log(originalX,originalY);
+  console.log(JSON.stringify(occupiedSquares))
   
   
   return validBool;
@@ -500,12 +515,12 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
 checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, currentY,
    currentPossibleStarts,visited, occupiedSquares, needsAMatch) =>{
 
-  if(occupiedSquares.some((ele) => ele[0] == currentX && ele[1] == currentY)){
-    if (debug){
-        console.log("hit occupied square");
-    }
-    return false;
-  }
+  // if(occupiedSquares.some((ele) => ele[0] == currentX && ele[1] == currentY)){
+  //   if (debug){
+  //       console.log("hit occupied square");
+  //   }
+  //   return false;
+  // }
 
   occupiedSquares.push([currentX,currentY])
     
