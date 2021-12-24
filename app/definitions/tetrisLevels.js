@@ -84,13 +84,15 @@ const levelPrologue = {
         ...tetrisObjects.singlePiece,
         location:{
           index: 2
-        }
+        },
+        firstPiece: true
       },
       {
         ...tetrisObjects.singlePiece,
         location:{
           index: 1
-        }
+        },
+        secondPiece: true
       }
       
     ],
@@ -192,7 +194,7 @@ const levelPrologue = {
       {
         ...tetrisObjects.squarePiece,
         location:{
-          index: 0
+          index: 3
         }
       },
       {
@@ -205,6 +207,27 @@ const levelPrologue = {
     ],
       
   }
+  const firstStageFinal = {
+      name: "squarePiece",
+      rows : 3,
+      columns : 3,
+      tetrisPieces : [
+        {
+          ...tetrisObjects.squarePiece,
+          location:{
+            index: 8
+          }
+        },
+        {
+          ...tetrisObjects.twoPiece,
+          location:{
+            index: 0
+          }
+        }
+        
+      ],
+        
+    }
   const level12 = {
     name: "squarePiece",
     rows : 3,
@@ -353,7 +376,7 @@ const levelPrologue = {
 
   
  export const levels = [levelPrologue,level1,level2,level3,level4, 
-  level5, level6, level7,level8,level9,level10,level11,level12,level13,level14,level15,level16];
+  level5, level6, level7,level8,level9,level10,level11,firstStageFinal, level12,level13,level14,level15,level16];
 
   export const levelPhase2 = [];
   levels.concat(levelPhase2);

@@ -164,7 +164,7 @@ export default class SingleTouch extends Component {
               this.state.movement.push(bottomMovement);
             }
           }
-      this.state.movement.push(val);
+          this.state.movement.push(val);
 
     }
     console.log(JSON.stringify(this.state.movement));
@@ -188,7 +188,8 @@ export default class SingleTouch extends Component {
       let currentBox = this.state.gridLocations[ele.location.index];
       let visited = [];
       let remainingBlocks = this.props.level.tetrisPieces.slice(1);
-      let constraintCheck = this.checkAllPossibleStarting(ele,  [[currentBox.x, currentBox.y]],visited,remainingBlocks,[]);
+      let constraintCheck = this.checkAllPossibleStarting(ele,  [[currentBox.x, currentBox.y]],visited,remainingBlocks,[],[]);
+      
       if (debug){
         console.log("RESULT")
         console.log(constraintCheck)
@@ -213,15 +214,14 @@ export default class SingleTouch extends Component {
 
 */
 
-checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainingBlocks,originalNeedsAMatch) => {
-
-  
+checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainingBlocks,originalNeedsAMatch,occupiedSquares) => {
   //pass in `needsAMatch`, only valid until new iteraiton of possible start (reset needsAMatch to original after every iteration)
 
   //currentPossibleStarts - occupiedSpace == new possible starting location of current tetris piece
   
   let validBool = false;
-  
+  let origOccupiedSquares = [];
+  // console.log(occupiedSquares);
   let remainingBlocksOriginal = remainingBlocks.slice(0);
   while (currentPossibleStarts.length != 0 && !validBool){
     let needsAMatch = originalNeedsAMatch.slice(0);
@@ -232,7 +232,6 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
     }
     let x = currentPossibleStarts[0][0];
     let y = currentPossibleStarts[0][1];
-    let occupiedSquares = [];
     let outOfBounds =  x >= WIDTH ||x <= 0 || y <= this.state.heightTop || y >=  this.state.heightTop + WIDTH ; 
     if (outOfBounds){
       if (debug){
@@ -245,7 +244,6 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
     validBool = this.checkTetrisConstraint(tetrisPiece, tetrisPiece.tetrisBlocks, "", x, y, currentPossibleStarts,visited, occupiedSquares , needsAMatch)
     
     
-    
       if (remainingBlocks.length > 0 && validBool){
         if (debug){
 
@@ -254,11 +252,13 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
         }
         let tmp = remainingBlocks[0];
         let currentBox = this.state.gridLocations[tmp.location.index];
-        let visited = [];
+        let visited =[];
         let remainingBlocksNew = remainingBlocks.slice(1);
         let newCurrentPossible = currentPossibleStarts.slice();
+        // let newCurrentPossible = [];
+
         newCurrentPossible.push([currentBox.x,currentBox.y]);
-        validBool = validBool && this.checkAllPossibleStarting(tmp,newCurrentPossible,visited,remainingBlocksNew,needsAMatch)
+        validBool = validBool && this.checkAllPossibleStarting(tmp,newCurrentPossible,visited,remainingBlocksNew,needsAMatch,[[x,y]])
       }
       else{
         if (needsAMatch.length == 0 && validBool){
@@ -266,6 +266,7 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
 
             console.log("FOUND ANSWER (LAST PIECE AND NO MATCH LEFt)")
           }
+          currentPossibleStarts.length = 0;
           return true;
         }
         else{
@@ -281,10 +282,20 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
       console.log("POSSIBLE START REMOVED")
 
     }
+    occupiedSquares = [];
 
   }
   if (debug)
     console.log(currentPossibleStarts);
+  
+  //check if tetris piece starting location is valid
+  let originalX = tetrisPiece.location.index % this.props.level.columns;
+  let originalY = Math.floor(tetrisPiece.location.index / this.props.level.rows);
+
+  // console.log(originalX,originalY);
+  // console.log(JSON.stringify(occupiedSquares))
+  
+  
   return validBool;
 }
 
@@ -406,10 +417,9 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
     if (foundOccupied){
       if (debug){
         console.log("HIT OCCUPIED");
-
       }
-      //thats okay, I don't want to travel in this direction anyway
-      return true;
+      //thats okay, I don't want to travel in this direction anyway, need to remove the "match"
+      // return true;
     }
 
     //need to be either the border, or the edge of screen
@@ -480,7 +490,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
     }
     else{
       if (debug)
-      console.log(direction + " made it");
+      console.log(direction + " made it\n\n");
       return true;
     }
     
@@ -489,6 +499,13 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
 
 checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, currentY,
    currentPossibleStarts,visited, occupiedSquares, needsAMatch) =>{
+
+  if(occupiedSquares.some((ele) => ele[0] == currentX && ele[1] == currentY)){
+    if (debug){
+        console.log("hit occupied square");
+    }
+    return false;
+  }
 
   occupiedSquares.push([currentX,currentY])
     
@@ -508,9 +525,6 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
 
   let aggregateBool = true; 
 
-  //hardcode square case, can't solve...
-
-  let isSquare = tetrisPiece.name && tetrisPiece.name == "Square" && Boolean(tetrisBlock.childDown);
   if (previousDirection != "down"){
     let res =this.checkConstraintDirection("up", tetrisPiece,tetrisBlock, currentX, currentY, currentPossibleStarts,visited,occupiedSquares,needsAMatch);
     aggregateBool = aggregateBool && res; 
@@ -519,7 +533,7 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
     let res = this.checkConstraintDirection("left",tetrisPiece, tetrisBlock, currentX, currentY,currentPossibleStarts,visited,occupiedSquares,needsAMatch);
     aggregateBool = aggregateBool && res; 
   }
-  if ( previousDirection != "left" && !isSquare){
+  if ( previousDirection != "left"){
    let res= this.checkConstraintDirection("right",tetrisPiece, tetrisBlock, currentX, currentY,currentPossibleStarts,visited,occupiedSquares,needsAMatch);
    aggregateBool = aggregateBool && res; 
   }
