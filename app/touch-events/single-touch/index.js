@@ -43,7 +43,8 @@ export default class SingleTouch extends Component {
       offset: offset,
       fullHeight:fullHeight,
       fullWidth: 0,
-      error: false,
+      needsAMatch : [],
+      tetrisPiecesRuleAchieved : [],
     };
     this.createGrid(this.state);
   }
@@ -95,7 +96,7 @@ export default class SingleTouch extends Component {
       })
       return;
     }
-
+ 
     //check if snake dies
 
     let invalidMovement = this.state.movement.find((coord) => coord[0] == val[0] && coord[1] == val[1]);
@@ -173,6 +174,7 @@ export default class SingleTouch extends Component {
 
  //need to move this up to index.js , as well as creategrid();
  evaluateRoute = () => {
+
   //triggers when player reaches the end 
 
   //evaluate if tetris rules are met 
@@ -184,6 +186,12 @@ export default class SingleTouch extends Component {
       return true;
     }
     else{
+
+      //reset all of the "highlight" checks
+      this.state.needsAMatch.length = 0;
+      this.state.tetrisPiecesRuleAchieved.length = 0;
+
+
       let ele = this.props.level.tetrisPieces[0];
       let currentBox = this.state.gridLocations[ele.location.index];
       let visited = [];
@@ -211,7 +219,6 @@ export default class SingleTouch extends Component {
           }
         } 
       )
-
 
       if (debug){
         console.log("RESULT")
@@ -241,14 +248,14 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
   //pass in `needsAMatch`, only valid until new iteraiton of possible start (reset needsAMatch to original after every iteration)
   
   let validBool = false;
-  let origOccupiedSquares = [];
   let occupiedSquares = [];
+  let needsAMatch = [];
   // console.log(occupiedSquares);
   let remainingBlocksOriginal = remainingBlocks.slice(0);
   while (currentPossibleStarts.length != 0 && !validBool){
     occupiedSquares = [];
 
-    let needsAMatch = originalNeedsAMatch.slice(0);
+    needsAMatch = originalNeedsAMatch.slice(0);
     remainingBlocks = remainingBlocksOriginal
     if (debug){
       console.log("CURRENT POSSIBLE STARTS");
@@ -266,11 +273,14 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
       currentPossibleStarts.shift();
       continue;
     }
-    
+    let needsAMatchBefore = needsAMatch.slice();
     validBool = this.checkTetrisConstraint(tetrisPiece, tetrisPiece.tetrisBlocks, "", x, y, currentPossibleStarts,visited, occupiedSquares , needsAMatch)
     
+    if (needsAMatchBefore.length == needsAMatch.length && validBool){
+       this.state.tetrisPiecesRuleAchieved.push(tetrisPiece.location.index);
+    }
     
-      if (remainingBlocks.length > 0 && validBool){
+      if (remainingBlocks.length > 0){
         if (debug){
 
           console.log("REMAINING BLOCKS")
@@ -281,11 +291,12 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
         let visited =[];
         let remainingBlocksNew = remainingBlocks.slice(1);
         let newCurrentPossible = currentPossibleStarts.slice(1);
+        
         // let newCurrentPossible = [];
         if (!newCurrentPossible.some((ele => ele[0] == currentBox.x && ele[1] == currentBox.y))){
-          newCurrentPossible.push([currentBox.x,currentBox.y]);
+          newCurrentPossible.unshift([currentBox.x,currentBox.y]);
         }
-        validBool = validBool && this.checkAllPossibleStarting(tmp,newCurrentPossible,visited,remainingBlocksNew,needsAMatch,occupiedSquaresRef)
+        validBool = this.checkAllPossibleStarting(tmp,newCurrentPossible,visited,remainingBlocksNew,needsAMatch,occupiedSquaresRef)
       }
       else{
         if (needsAMatch.length == 0 && validBool){
@@ -313,12 +324,12 @@ checkAllPossibleStarting = (tetrisPiece, currentPossibleStarts, visited,remainin
   }
   if (debug)
     console.log(currentPossibleStarts);
-  
-
+  needsAMatch.map((ele) => this.state.needsAMatch.push(ele));
   occupiedSquaresRef = occupiedSquares.map((ele) => occupiedSquaresRef.push(ele));
   
   
   return validBool;
+
 }
 
 checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, currentY, currentPossibleStarts,visited,occupiedSquares,needsAMatch) => {
@@ -424,6 +435,8 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
     if (borderCondition || hitEdge || foundOccupied){
       if (debug)
         console.log(direction + " failed (found border when child piece exists)");
+      //add this tetris piece to "needsAMatch" without coordinates, hacky fix .
+      needsAMatch.push({tetrisIndex : tetrisPiece.location.index, start:[-1,-1], end:[-1,-1]});
       return false;
     }
     if (debug){
@@ -475,7 +488,7 @@ checkConstraintDirection = (direction,tetrisPiece, tetrisBlock, currentX, curren
       }
       else{
         let border = {start: [xCoordOfPath,yCoordOfPath],
-          end: [xCoordOfPathEnd,yCoordOfPathEnd]}
+          end: [xCoordOfPathEnd,yCoordOfPathEnd], tetrisIndex: tetrisPiece.location.index}
           needsAMatch.push(border);
           if (debug){
 
@@ -650,9 +663,9 @@ createGrid(state){
   render() {
 
     return (
-    <ErrorBoundary FallbackComponent={this.ErrorFallback} rresetKeys = {Object.values(this.state)} onReset = {() => this.props.unmount()}>
+    <ErrorBoundary FallbackComponent={this.ErrorFallback} onReset = {() => this.props.unmount()}>
 
-      {!this.state.error && <GameLoop style={styles.container} onUpdate={this.onUpdate}>
+      { <GameLoop style={styles.container} onUpdate={this.onUpdate}>
         <StatusBar hidden={true} />
       <View style = {{position:"absolute", top: this.state.heightTop, width: this.state.fullWidth + this.state.padding,
        height: this.state.fullHeight + this.state.padding, backgroundColor:"silver",zIndex:-1}}>

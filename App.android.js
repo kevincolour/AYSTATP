@@ -21,7 +21,7 @@ export default class App extends Component {
 
     super(props);
     this.state = {
-      currentLevelIndex: 0,
+      currentLevelIndex: 8,
       sceneVisible: false,
       scene: null
     };
@@ -50,7 +50,7 @@ export default class App extends Component {
     if (newLevel < 0){
       return;
     }
-    let newLevelComponent = <SingleTouch key = {newLevel} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
+    let newLevelComponent = <SingleTouch key = {newLevel} unmount = {this.unMountScene} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
     this.setState({
       sceneVisible:true,
       scene: newLevelComponent,

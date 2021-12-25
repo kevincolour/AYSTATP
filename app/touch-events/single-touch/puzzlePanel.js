@@ -2,6 +2,7 @@ import React, { PureComponent,Component } from "react";
 import { StyleSheet, View, Dimensions ,Image, Text,Pressable	} from "react-native";
 import { StaggeredMotion, spring } from "react-motion";
 import {WinImageObject,RedoImageObject,PreviousImageObject,NextImageObject} from "../../definitions/assetObjects"
+import * as Animatable from "react-native-animatable";
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
@@ -119,21 +120,25 @@ export default class PuzzlePanel extends Component {
 		// 	pathStyle.height = lastSeenY - this.props.y + this.props.padding;
 		// }
 		// const lineProgress = <View style ={pathStyle}></View>
-
-
 		const gridWithPieces = [];
 		const gameObj = this;
 		this.props.gridLocations.forEach(function(ele,ind){
 			let associatedTetrisPiece = gameObj.props.level.tetrisPieces.find((ele) => ele.location.index == ind)
-			let square =             <View 
+			let square =         <View 
 			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
 			height:ele.height, backgroundColor: "grey", justifyContent: "center", alignItems: "center",
 			borderWidth: 0 ,borderRadius: 5}} key={ind}>
-	
-		{associatedTetrisPiece  && 
+		{associatedTetrisPiece  && gameObj.props.failure && !gameObj.props.tetrisPiecesRuleAchieved.some((ele) => ele == associatedTetrisPiece.location.index)
+		 && gameObj.props.needsAMatch.some((ele2) => ele2.tetrisIndex== associatedTetrisPiece.location.index) &&
+					<Animatable.Image style ={{position: "absolute",left: 0, top: 0, width: ele.width,
+			height:ele.height,
+			borderWidth: 0}} animation={"shake"} source={associatedTetrisPiece.img}  />
+			
+				} 
+				{associatedTetrisPiece  &&
 					<Image style ={{position: "absolute",left: 0, top: 0, width: ele.width,
-			height:ele.height, 
-			borderWidth: 0}} source={associatedTetrisPiece.img} />
+			height:ele.height,
+			borderWidth: 0}} source={associatedTetrisPiece.img}  />
 			
 				} 
 			</View>;
