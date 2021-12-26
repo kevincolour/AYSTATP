@@ -86,7 +86,9 @@ export default class SingleTouch extends Component {
     let currentLocation = this.state.movement[this.state.movement.length-1];
  
     //check final state
-    if (this.state.success || this.state.failure){
+
+    
+    if (this.state.success){
       this.state.movement.pop();
       this.setState ({
         x: this.state.movement[this.state.movement.length-1][0],
@@ -128,6 +130,7 @@ export default class SingleTouch extends Component {
     if (!invalidMovement && Math.ceil(val[0]) >= this.state.validPathsX[this.state.validPathsX.length - 1] && val[1] <= this.state.validPathsY[0]){
       this.state.movement.push(val);
       this.evaluateRoute();
+     
       return;
     }
     else{
@@ -661,7 +664,7 @@ createGrid(state){
   )
 }
   render() {
-
+   
     return (
     <ErrorBoundary FallbackComponent={this.ErrorFallback} onReset = {() => this.props.unmount()}>
 

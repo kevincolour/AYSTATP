@@ -62,6 +62,10 @@ export default class PuzzlePanel extends Component {
 		let paddingWithOverlap = padding + overlap * 2;
 		//populate the path taken so far in a list of views
 		const viewPath = [];
+		const initialCircle = <View style = {{position: "absolute", left: 0, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
+		width: paddingWithOverlap + padding,
+	   top: this.props.offset + this.props.fullHeight -overlap - padding, backgroundColor: "blue", zIndex: -1}}></View>
+		
 		let index = 1; 
 		if (this.props.movement.length > 0){
 			while (index < this.props.movement.length){
@@ -80,14 +84,14 @@ export default class PuzzlePanel extends Component {
 				//I went up.
 				if (verticalDifference < 0){
 					pathStyle.width = paddingWithOverlap ;
-					pathStyle.height = Math.abs(verticalDifference) + paddingWithOverlap;
+					pathStyle.height = Math.abs(verticalDifference) ;
 				}
 				
 				//I went down
 				else if (verticalDifference > 0){
 					pathStyle.width = paddingWithOverlap;
-					pathStyle.height = Math.abs(verticalDifference) + paddingWithOverlap;
-					pathStyle.top = prevPath[1] - overlap;
+					pathStyle.height = Math.abs(verticalDifference) ;
+					pathStyle.top = prevPath[1] - overlap + paddingWithOverlap;
 				}
 				//I went left
 				else if (horizontalDifference < 0){
@@ -97,16 +101,16 @@ export default class PuzzlePanel extends Component {
 				//I went right
 				else if (horizontalDifference > 0){
 					pathStyle.height = paddingWithOverlap
-					pathStyle.width = Math.abs(horizontalDifference) + paddingWithOverlap;
-					pathStyle.left = prevPath[0] - overlap;
+					pathStyle.width = Math.abs(horizontalDifference);
+					pathStyle.left = prevPath[0] - overlap + paddingWithOverlap;
 				}
 
 				viewPath.push(<View style = {pathStyle} key={index}></View>);
 				index++;
 			}
 		}
-
 		
+	
 		// let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
 		// let pathStyle = {
 		// 	position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
@@ -162,6 +166,8 @@ export default class PuzzlePanel extends Component {
 		const previousImage = <PreviousImageObject {...this.props}/>
 		const nextImage = <NextImageObject {...this.props}/>
 	  
+
+		 
 		return (
 			<>
 			
@@ -170,7 +176,12 @@ export default class PuzzlePanel extends Component {
 		
 
 			{gridWithPieces}
-			{viewPath}
+			{initialCircle}
+			{this.props.failure ?
+			<Animatable.View onAnimationEnd={() => this.props.clearMovement()} duration={2000} animation={"fadeOut"}>
+
+				{viewPath}
+			</Animatable.View> : viewPath}
 			{gaps}
 			{nextImage}
 			{previousImage}
