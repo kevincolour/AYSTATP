@@ -4,7 +4,8 @@ import { StaggeredMotion, spring } from "react-motion";
 import WinImageObject from "../../definitions/assetObjects"
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
-const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
+// const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
+const BODY_DIAMETER = 20;
 const BORDER_WIDTH = Math.trunc(BODY_DIAMETER * 0.1);
 const COLORS = ["#86E9BE", "#8DE986", "#B8E986", "#E9E986"];
 const BORDER_COLORS = ["#C0F3DD", "#C4F6C0", "#E5FCCD", "#FCFDC1"];
@@ -49,14 +50,18 @@ export default class PuzzlePanel extends Component {
 		let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
 		let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
 
-
-
-		//new x coord
-			if (lastKnownX != closestX || lastKnownY != closestY){
-			//track last known 
+		if(this.props.movement.length == 0){
 			let newCoordArray = [closestX,closestY];
 			this.props.trackMovementFunc(newCoordArray);
 		}
+
+
+		// //new x coord
+		// 	if (lastKnownX != closestX || lastKnownY != closestY){
+		// 	//track last known 
+		// 	let newCoordArray = [closestX,closestY];
+		// 	this.props.trackMovementFunc(newCoordArray);
+		// }
 
 
 		let overlap = 1;
@@ -108,19 +113,37 @@ export default class PuzzlePanel extends Component {
 		}
 
 		
-		// let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
+		let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
+		let pathStyle = {
+			position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
+		}
+		//populate line so far
+		//going up
+		// console.log(lastSeenY, this.props.y);
+		if (lastSeenY > this.props.y){
+			// console.log("here")
+			pathStyle.top = this.props.y;
+			pathStyle.height = lastSeenY - this.props.y + this.props.padding;
+		}
+		else if (lastSeenY < this.props.y){
+			pathStyle.top = lastSeenY ;
+			pathStyle.height =  this.props.y - lastSeenY + this.props.padding;
+		}
+
+		// let lastSeenX = this.props.movement[this.props.movement.length- 1][0];
 		// let pathStyle = {
-		// 	position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
+		// 	position: "absolute", left: closestY, left: lastSeenX, height: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
 		// }
 		// //populate line so far
 		// //going up
 		// // console.log(lastSeenY, this.props.y);
-		// if (lastSeenY > this.props.y){
+		// if (lastSeenX > this.props.x){
 		// 	// console.log("here")
-		// 	pathStyle.top = this.props.y;
+		// 	pathStyle.left = this.props.x;
 		// 	pathStyle.height = lastSeenY - this.props.y + this.props.padding;
 		// }
-		// const lineProgress = <View style ={pathStyle}></View>
+
+		const lineProgress = <View style ={pathStyle}></View>
 
 
 		const gridWithPieces = [];
@@ -205,7 +228,7 @@ export default class PuzzlePanel extends Component {
 
 			{gridWithPieces}
 			{lineProgress}
-			{/* {viewPath} */}
+			{viewPath} 	
 			{gaps}
 			{winImage}
 		<View >
