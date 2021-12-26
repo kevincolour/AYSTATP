@@ -84,7 +84,7 @@ const NextImageObject = (props) => {
 				{({ pressed }) => (
                     <Animatable.Image
         ref={image}
-          delay={500}
+          delay={100}
           animation={"bounceIn"}
           style={{ width: imageOffset,height : imageOffset}}
 	
