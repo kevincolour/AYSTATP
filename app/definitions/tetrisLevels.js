@@ -37,7 +37,39 @@ const levelPrologue = {
       }
     }]
   }
-  
+  const level2half = {
+    name: "squarePiece",
+    rows : 3,
+    columns : 1,
+    tetrisPieces : [{
+      ...tetrisObjects.twoPieceVertical,
+      location:{
+        index: 2
+      }
+    }]
+  }
+  const level2extra = {
+    name: "squarePiece",
+    rows : 3,
+    columns : 2,
+    tetrisPieces : [{
+      ...tetrisObjects.twoPieceVertical,
+      location:{
+        index: 2
+      }
+    }]
+  }
+  const level2extraExtra = {
+    name: "squarePiece",
+    rows : 3,
+    columns : 2,
+    tetrisPieces : [{
+      ...tetrisObjects.twoPieceVertical,
+      location:{
+        index: 3
+      }
+    }]
+  }
   const level3 = {
     name: "squarePiece",
     rows : 2,
@@ -375,7 +407,7 @@ const levelPrologue = {
   }
 
   
- export const levels = [levelPrologue,level1,level2,level3,level4, 
+ export const levels = [levelPrologue,level1,level2,level2half,level2extra,level2extraExtra, level3,level4, 
   level5, level6, level7,level8,level9,level10,level11,firstStageFinal, level12,level13,level14,level15,level16];
 
   export const levelPhase2 = [];

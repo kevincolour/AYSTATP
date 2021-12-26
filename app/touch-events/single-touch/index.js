@@ -9,7 +9,7 @@ import {ErrorBoundary} from 'react-error-boundary';
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const checkAll = true;
-const debug = true;
+const debug = false;
 export default class SingleTouch extends Component {
   constructor(props) {
     super(props);
