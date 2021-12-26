@@ -62,9 +62,9 @@ export default class PuzzlePanel extends Component {
 		let paddingWithOverlap = padding + overlap * 2;
 		//populate the path taken so far in a list of views
 		const viewPath = [];
-		const initialCircle = <View style = {{position: "absolute", left: 0, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
+		const initialCircle = <View style = {{position: "absolute", left: -5, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
 		width: paddingWithOverlap + padding,
-	   top: this.props.offset + this.props.fullHeight -overlap - padding, backgroundColor: "blue", zIndex: -1}}></View>
+	   top: this.props.offset + this.props.fullHeight -overlap - padding + 5, backgroundColor: "blue", zIndex: -1}}></View>
 		
 		let index = 1; 
 		if (this.props.movement.length > 0){
@@ -178,7 +178,7 @@ export default class PuzzlePanel extends Component {
 			{gridWithPieces}
 			{initialCircle}
 			{this.props.failure ?
-			<Animatable.View onAnimationEnd={() => this.props.clearMovement()} duration={2000} animation={"fadeOut"}>
+			<Animatable.View onAnimationEnd={() => this.props.onFailedPath()} duration={2000} animation={"fadeOut"}>
 
 				{viewPath}
 			</Animatable.View> : viewPath}

@@ -5,6 +5,9 @@ import PuzzlePanel from "./puzzlePanel";
 import NextButton from "./nextButton";
 import { LinearGradient } from "expo-linear-gradient";
 import {ErrorBoundary} from 'react-error-boundary';
+import { Audio } from 'expo-av';
+
+// import Sound from 'react-native-sound';
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -49,8 +52,29 @@ export default class SingleTouch extends Component {
     this.createGrid(this.state);
   }
 
-  setRenderComplete = (complete) => {
-    this.setState({renderComplete : complete})
+   onFailedPath = async() => {
+
+       
+       this.clearMovement();
+  }
+
+  playErrorSound = async() => {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync(
+      require('../../../assets/Sounds/errorSound.wav')
+      );
+      // setSound(sound);
+      await sound.playAsync();
+      console.log('Playing Sound');
+  }
+  playSuccessSound = async() => {
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync(
+      require('../../../assets/Sounds/successEffect.wav')
+      );
+      // setSound(sound);
+      await sound.playAsync();
+      console.log('Playing Sound');
   }
 
   onUpdate = ({ touches }) => {
@@ -168,6 +192,7 @@ export default class SingleTouch extends Component {
               this.state.movement.push(bottomMovement);
             }
           }
+          // this.setState({x:val[0], y:val[1]})
           this.state.movement.push(val);
 
     }
@@ -229,9 +254,11 @@ export default class SingleTouch extends Component {
       }
       if (constraintCheck){
         this.setState({success:true})
+        this.playSuccessSound();
       }
       else{
         this.setState({failure:true})
+          this.playErrorSound();
       }
     }
 
@@ -664,7 +691,7 @@ createGrid(state){
   )
 }
   render() {
-   
+ 
     return (
     <ErrorBoundary FallbackComponent={this.ErrorFallback} onReset = {() => this.props.unmount()}>
 
@@ -680,7 +707,7 @@ createGrid(state){
         level = {this.props.level}
         clearMovement = {this.clearMovement}
         evaluateRoute = {this.evaluateRoute}
-        setRenderComplete = {this.setRenderComplete}
+        onFailedPath = {this.onFailedPath}
         trackMovementFunc={this.trackMovement}/>
       </GameLoop>}
     </ErrorBoundary>

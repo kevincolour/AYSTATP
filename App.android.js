@@ -21,7 +21,7 @@ export default class App extends Component {
 
     super(props);
     this.state = {
-      currentLevelIndex: 5,
+      currentLevelIndex: 0,
       sceneVisible: false,
       scene: null
     };
