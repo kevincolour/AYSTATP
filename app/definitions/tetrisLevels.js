@@ -27,7 +27,7 @@ const levelPrologue = {
   }
   
   const level2 = {
-    name: "squarePiece",
+    name: "level2",
     rows : 3,
     columns : 1,
     tetrisPieces : [{
@@ -38,7 +38,7 @@ const levelPrologue = {
     }]
   }
   const level2half = {
-    name: "squarePiece",
+    name: "level2Helper",
     rows : 3,
     columns : 1,
     tetrisPieces : [{
@@ -49,7 +49,7 @@ const levelPrologue = {
     }]
   }
   const level2extra = {
-    name: "squarePiece",
+    name: "level2extra",
     rows : 3,
     columns : 2,
     tetrisPieces : [{
@@ -60,7 +60,7 @@ const levelPrologue = {
     }]
   }
   const level2extraExtra = {
-    name: "squarePiece",
+    name: "level2extraExtra",
     rows : 3,
     columns : 2,
     tetrisPieces : [{
@@ -71,7 +71,7 @@ const levelPrologue = {
     }]
   }
   const level2extraExtraExtra = {
-    name: "squarePiece",
+    name: "level2extraExtraExtra",
     rows : 3,
     columns : 3,
     tetrisPieces : [{
@@ -82,7 +82,7 @@ const levelPrologue = {
     }]
   }
   const level3 = {
-    name: "squarePiece",
+    name: "level3",
     rows : 2,
     columns : 2,
     tetrisPieces : [{
@@ -93,7 +93,7 @@ const levelPrologue = {
     }]
   }
   const level4 = {
-    name: "lPiece",
+    name: "level4",
     rows : 3,
     columns : 3,
     tetrisPieces : [{
@@ -106,7 +106,7 @@ const levelPrologue = {
   }
   
   const level5 = {
-    name: "squarePiece",
+    name: "level5",
     rows : 5,
     columns : 5,
     tetrisPieces : [{
@@ -120,7 +120,7 @@ const levelPrologue = {
   }
   
   const level6 = {
-    name: "squarePiece",
+    name: "level6",
     rows : 3,
     columns : 1,
     tetrisPieces : [{
@@ -145,7 +145,7 @@ const levelPrologue = {
   }
 
   const level7 = {
-    name: "squarePiece",
+    name: "level7",
     rows : 3,
     columns : 1,
     tetrisPieces : [{
@@ -167,7 +167,7 @@ const levelPrologue = {
       
   }
   const level8 = {
-    name: "squarePiece",
+    name: "level8",
     rows : 3,
     columns : 2,
     tetrisPieces : [{
@@ -187,7 +187,7 @@ const levelPrologue = {
       
   }
   const level9 = {
-    name: "squarePiece",
+    name: "level9",
     rows : 3,
     columns : 3,
     tetrisPieces : [
@@ -208,7 +208,7 @@ const levelPrologue = {
       
   }
   const level10 = {
-    name: "squarePiece",
+    name: "level10",
     rows : 3,
     columns : 3,
     tetrisPieces : [
@@ -230,7 +230,7 @@ const levelPrologue = {
   }
 
   const level11 = {
-    name: "squarePiece",
+    name: "level11",
     rows : 3,
     columns : 3,
     tetrisPieces : [
@@ -251,7 +251,7 @@ const levelPrologue = {
       
   }
   const firstStageFinal = {
-      name: "squarePiece",
+      name: "firstStageFinal",
       rows : 3,
       columns : 3,
       tetrisPieces : [
@@ -272,7 +272,7 @@ const levelPrologue = {
         
     }
   const level12 = {
-    name: "squarePiece",
+    name: "level12",
     rows : 3,
     columns : 7,
     tetrisPieces : [
@@ -298,9 +298,30 @@ const levelPrologue = {
     ],
       
   }
-
+  const level13Help = {
+    name: "level13Help",
+    rows : 4,
+    columns : 4,
+    tetrisPieces : [
+      {
+        ...tetrisObjects.threePieceVertical,
+        location:{
+          index: 12
+        }
+      },
+ 
+      {
+        ...tetrisObjects.fourPiece,
+        location:{
+          index: 4
+        }
+      }
+      
+    ],
+      
+  }
   const level13 = {
-    name: "squarePiece",
+    name: "level13",
     rows : 4,
     columns : 4,
     tetrisPieces : [
@@ -328,7 +349,7 @@ const levelPrologue = {
       
   }
   const level14 = {
-    name: "squarePiece",
+    name: "level14",
     rows : 4,
     columns : 4,
     tetrisPieces : [
@@ -357,7 +378,7 @@ const levelPrologue = {
   }
 
   const level15 = {
-    name: "squarePiece",
+    name: "level15",
     rows : 5,
     columns : 5,
     tetrisPieces : [
@@ -384,7 +405,7 @@ const levelPrologue = {
       
   }
   const level16 = {
-    name: "squarePiece",
+    name: "level16",
     rows : 5,
     columns : 5,
     tetrisPieces : [
@@ -419,7 +440,7 @@ const levelPrologue = {
 
   
  export const levels = [levelPrologue,level1,level2,level2half,level2extra,level2extraExtra, level2extraExtraExtra,level3,level4, 
-  level5, level6, level7,level8,level9,level10,level11,firstStageFinal, level12,level13,level14,level15,level16];
+  level5, level6, level7,level8,level9,level10,level11,firstStageFinal, level12,level13Help,level13,level14,level15,level16];
 
   export const levelPhase2 = [];
   levels.concat(levelPhase2);

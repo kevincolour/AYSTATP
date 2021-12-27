@@ -1,6 +1,6 @@
 
 import React, { PureComponent,Component,useRef } from "react";
-import { View, StyleSheet, TouchableOpacity ,Dimensions,Image,Pressable,Text} from "react-native";
+import { View, StyleSheet, TouchableOpacity ,Dimensions,Image,Pressable,Text, Button} from "react-native";
 import * as Animatable from "react-native-animatable";
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
@@ -25,14 +25,15 @@ const RedoImageObject = (props) => {
     }
 
   return ( 
-    <View style = {{position: "absolute",left:WIDTH/2 - imageOffset/2,
-    top: props.offset - props.padding*3}}>
+    <View style = {{...buttonStyle(props), left:WIDTH/2 - imageOffset/2 - 10}}>
 
   <Pressable
     onPress={() => {
       props.clearMovement();
       animateImage();
+      
     }}
+    hitSlop = {20}
     style={({ pressed }) => [
     {
       // backgroundColor: pressed
@@ -60,19 +61,27 @@ source={require("../../assets/redo-solid.png")}
 
 const NextImageObject = (props) => {
 
+  React.useEffect(() =>  {
+    
+    if (image.current){
+
+      // image.current.bounceIn({delay:500});
+    }
+  },[props.name])
+
     const image= useRef();
     const buttonPressed = () =>{
         console.log("here");
     }
-
-    return ( props.success && 
-        <View style = {{position: "absolute",left:WIDTH - 50,
-        top: props.offset - props.padding*3}}>
+    const shouldShow = props.success
+    return ( shouldShow && 
+     <View style = {{...buttonStyle(props), left:WIDTH - 50}}>
 
 			<Pressable
 				onPress={() => {
 					props.loadNext(1);
 				}}
+        hitSlop={20}
 				style={({ pressed }) => [
 				{
 					// backgroundColor: pressed
@@ -107,10 +116,10 @@ const PreviousImageObject = (props) => {
     }
 
     return ( 
-        <View style = {{position: "absolute",left:20,
-        top: props.offset - props.padding*3}}>
+      <View style = {{...buttonStyle(props), left: 0}}>
 
 			<Pressable
+      hitSlop={20}
 				onPress={() => {
 					props.loadNext(-1);
 				}}
@@ -140,5 +149,8 @@ const PreviousImageObject = (props) => {
 
     
 }
+
+const buttonStyle = (props) => { return {position: "absolute",
+top: props.offset - props.padding*4, padding: 10}}
 
 export  {WinImageObject,RedoImageObject, NextImageObject, PreviousImageObject};

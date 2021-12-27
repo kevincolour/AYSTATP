@@ -6,6 +6,7 @@ import EStyleSheet from "react-native-extended-stylesheet";
 import TableOfContents from "./app/table-of-contents";
 import SingleTouch from "./app/touch-events/single-touch";
 import {levels} from "./app/definitions/tetrisLevels";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 EStyleSheet.build();
 
@@ -17,13 +18,29 @@ console.disableYellowBox = true;
 
 
 export default class App extends Component {
+
+
+  async componentDidMount() {
+    try{
+       
+      const maxLevel = parseInt(await AsyncStorage.getItem('@levelMax'));
+      console.log(maxLevel);
+      if (maxLevel){
+        this.setState({maxValue:maxLevel,currentLevelIndex:maxLevel})
+      }
+    }
+    finally{
+
+    }
+  }
   constructor(props) {
 
     super(props);
     this.state = {
       currentLevelIndex: 0,
       sceneVisible: false,
-      scene: null
+      scene: null,
+      maxValue : 0
     };
   }
 
@@ -44,12 +61,22 @@ export default class App extends Component {
 
 
 
-  nextLevelLoad = (increment) =>{
-    console.log(increment);
+  nextLevelLoad = async (increment) =>{
+
+
     let newLevel = this.state.currentLevelIndex + increment;
     if (newLevel < 0){
       return;
     }
+    const maxValue = this.state.maxValue
+
+    if (newLevel > maxValue){
+      this.setState({maxValue: maxValue});
+      await AsyncStorage.setItem('@levelMax', JSON.stringify(newLevel));
+    }
+
+
+    
     let newLevelComponent = <SingleTouch key = {newLevel} unmount = {this.unMountScene} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
     this.setState({
       sceneVisible:true,

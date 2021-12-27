@@ -6,6 +6,7 @@ import NextButton from "./nextButton";
 import { LinearGradient } from "expo-linear-gradient";
 import {ErrorBoundary} from 'react-error-boundary';
 import { Audio } from 'expo-av';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // import Sound from 'react-native-sound';
 
@@ -13,8 +14,61 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const checkAll = true;
 const debug = false;
+
+const storeData = async (key,value) => {
+  try {
+    if (value){
+      await AsyncStorage.setItem('@level_' + key, JSON.stringify(value));
+
+    }
+  } catch (e) {
+    // saving error
+  }
+}
+
+const getMaxLevel = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('@levelMax')
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch(e) {
+    console.log("getMaxLevelError" , e)
+    // error reading value
+  } 
+}
+
+const getData = async (key) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('@level_' + key)
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch(e) {
+    console.log("getDataError" , e)
+    // error reading value
+  }
+}
+
 export default class SingleTouch extends Component {
+
+  
+  async componentDidMount() {  
+    try {
+
+      let levelData =  await getData(this.state.name);
+      if (levelData){
+        if(levelData.movement){
+          const lastMovement = levelData.movement[levelData.movement.length-1];
+          this.setState({movement: levelData.movement,success:true,x:lastMovement[0],y:lastMovement[1]})
+        }
+      }
+
+    } catch(err) {
+      console.log(err)
+      
+    }
+
+}
+
   constructor(props) {
+
     super(props);
     const padding = 20;
 		this.n = Math.max(this.props.level.columns, this.props.level.rows);
@@ -30,6 +84,7 @@ export default class SingleTouch extends Component {
     this.state = {
       x: 0,
       y: this.yStart,
+      name: this.props.level.name,
       movement: [],
       victory: false,
       gridLocations : [],
@@ -38,7 +93,6 @@ export default class SingleTouch extends Component {
 			width: width,
       height: height,
 			padding : padding,
-			renderComplete: false,
       success : false,
       failure : false,
       heightTop : Math.ceil(offset),
@@ -59,22 +113,18 @@ export default class SingleTouch extends Component {
   }
 
   playErrorSound = async() => {
-    console.log('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(
       require('../../../assets/Sounds/errorSound.wav')
       );
       // setSound(sound);
       await sound.playAsync();
-      console.log('Playing Sound');
   }
   playSuccessSound = async() => {
-    console.log('Loading Sound');
     const { sound } = await Audio.Sound.createAsync(
       require('../../../assets/Sounds/successEffect.wav')
       );
       // setSound(sound);
       await sound.playAsync();
-      console.log('Playing Sound');
   }
 
   onUpdate = ({ touches }) => {
@@ -201,7 +251,7 @@ export default class SingleTouch extends Component {
   }
 
  //need to move this up to index.js , as well as creategrid();
- evaluateRoute = () => {
+ evaluateRoute = async() => {
 
   //triggers when player reaches the end 
 
@@ -254,6 +304,7 @@ export default class SingleTouch extends Component {
       }
       if (constraintCheck){
         this.setState({success:true})
+        storeData(this.props.level.name, {movement : this.state.movement})
         this.playSuccessSound();
       }
       else{

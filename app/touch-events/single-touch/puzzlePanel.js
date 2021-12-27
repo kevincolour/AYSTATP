@@ -64,7 +64,7 @@ export default class PuzzlePanel extends Component {
 		const viewPath = [];
 		const initialCircle = <View style = {{position: "absolute", left: -5, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
 		width: paddingWithOverlap + padding,
-	   top: this.props.offset + this.props.fullHeight -overlap - padding + 5, backgroundColor: "blue", zIndex: -1}}></View>
+	   top: this.props.offset + this.props.fullHeight -overlap - padding + 5, backgroundColor: "blue", zIndex: 2}}></View>
 		
 		let index = 1; 
 		if (this.props.movement.length > 0){
