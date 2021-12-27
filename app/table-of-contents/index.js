@@ -52,11 +52,6 @@ export default class TableOfContents extends Component {
 
   onBackPress = async ev => {
     if (this.state.parent) {
-      this.refs.engine.publishEvent({
-        type: "back-pressed",
-        x: ev.nativeEvent.pageX,
-        y: ev.nativeEvent.pageY
-      });
 
       let parent = this.state.parent;
       let backButton = this.refs["back"];

@@ -68,7 +68,7 @@ export default class SingleTouch extends Component {
 }
 
   constructor(props) {
-
+    console.log(props);
     super(props);
     const padding = 20;
 		this.n = Math.max(this.props.level.columns, this.props.level.rows);

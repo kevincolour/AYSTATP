@@ -7,6 +7,7 @@ import TableOfContents from "./app/table-of-contents";
 import SingleTouch from "./app/touch-events/single-touch";
 import {levels} from "./app/definitions/tetrisLevels";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import LevelSelect from "./app/touch-events";
 
 EStyleSheet.build();
 
@@ -26,8 +27,15 @@ export default class App extends Component {
       const maxLevel = parseInt(await AsyncStorage.getItem('@levelMax'));
       console.log(maxLevel);
       if (maxLevel){
-        this.setState({maxValue:maxLevel,currentLevelIndex:maxLevel})
+        
+        if (maxLevel <= levels.length - 1){
+          this.setState({maxValue:maxLevel,currentLevelIndex:maxLevel})
+        }
+        else{
+          await AsyncStorage.removeItem('@levelMax');
+        }
       }
+
     }
     finally{
 
@@ -85,13 +93,23 @@ export default class App extends Component {
     })
 
   }
-
+  getProps = () => {
+    const tetrisProps = {
+      unmount : this.unMountScene ,
+      loadNext : this.nextLevelLoad,
+      level : levels[this.state.currentLevelIndex],
+      triggerVictory : this.triggerVictory
+    }
+    console.log(tetrisProps);
+    return tetrisProps;
+  }
   // triggerVictory = () =>{
   //   this.setState({
   //     victory: true
   //   });
   // }
   render() {  
+
     return (
       
       <View style={{ flex: 1 }}>
@@ -100,10 +118,8 @@ export default class App extends Component {
           contents={{
             heading: "AYSTATP",
             items: [
-              {
-                heading: "Play",
-                onPress: _ => this.mountScene(<SingleTouch unmount = {this.unMountScene} loadNext = {this.nextLevelLoad} level = {levels[this.state.currentLevelIndex]} triggerVictory = {this.triggerVictory}/>)
-              },
+              LevelSelect(this.mountScene,this.getProps)
+              ,
               {
                 heading: "Levels",
                 // onPress: _ => this.mountScene(<SingleTouch />)
