@@ -7,6 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import {ErrorBoundary} from 'react-error-boundary';
 import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { join } from "lodash";
 
 // import Sound from 'react-native-sound';
 
@@ -15,10 +16,10 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 const checkAll = true;
 const debug = false;
 
-const storeData = async (key,value) => {
+const storeData = async (key,value, type) => {
   try {
     if (value){
-      await AsyncStorage.setItem('@level_' + key, JSON.stringify(value));
+      await AsyncStorage.setItem('@level_' + type + "_" + key, JSON.stringify(value));
 
     }
   } catch (e) {
@@ -26,19 +27,10 @@ const storeData = async (key,value) => {
   }
 }
 
-const getMaxLevel = async () => {
-  try {
-    const jsonValue = await AsyncStorage.getItem('@levelMax')
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
-  } catch(e) {
-    console.log("getMaxLevelError" , e)
-    // error reading value
-  } 
-}
 
-const getData = async (key) => {
+const getData = async (key,type) => {
   try {
-    const jsonValue = await AsyncStorage.getItem('@level_' + key)
+    const jsonValue = await AsyncStorage.getItem('@level_' + type + "_" + key)
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch(e) {
     console.log("getDataError" , e)
@@ -52,7 +44,8 @@ export default class SingleTouch extends Component {
   async componentDidMount() {  
     try {
 
-      let levelData =  await getData(this.state.name);
+      let levelData =  await getData(this.state.name,this.props.type);
+      levelData = null;
       if (levelData){
         if(levelData.movement){
           const lastMovement = levelData.movement[levelData.movement.length-1];
@@ -68,7 +61,7 @@ export default class SingleTouch extends Component {
 }
 
   constructor(props) {
-    console.log(props);
+    // console.log(props);
     super(props);
     const padding = 20;
 		this.n = Math.max(this.props.level.columns, this.props.level.rows);
@@ -102,6 +95,11 @@ export default class SingleTouch extends Component {
       fullWidth: 0,
       needsAMatch : [],
       tetrisPiecesRuleAchieved : [],
+      startX: 0,
+      startY: this.yStart,
+      endX: 0,
+      endY: offset,
+      type: this.props.type
     };
     this.createGrid(this.state);
   }
@@ -145,8 +143,8 @@ export default class SingleTouch extends Component {
   clearMovement = () =>{
     this.setState({
       movement: [],
-      x : 0,
-      y : this.state.fullHeight + this.state.offset,
+      x : this.state.startX,
+      y : this.state.startY,
       success: false,
       failure:false,
     })
@@ -201,7 +199,7 @@ export default class SingleTouch extends Component {
     }
     //check if player reached the "end"
 
-    if (!invalidMovement && Math.ceil(val[0]) >= this.state.validPathsX[this.state.validPathsX.length - 1] && val[1] <= this.state.validPathsY[0]){
+    if (!invalidMovement && val[0] == this.state.endX && val[1] == this.state.endY){
       this.state.movement.push(val);
       this.evaluateRoute();
      
@@ -259,9 +257,9 @@ export default class SingleTouch extends Component {
 
   //check every possible grid spot as a starting location for tetris rule to evaluate
     // from each grid spot, try navigating to each spot, start at top of the tetris piece
-
-    if (this.props.level.tetrisPieces.length == 0){
-      return true;
+    let constraintAll = true;
+    if (this.props.level.tetrisPieces == undefined || this.props.level.tetrisPieces.length == 0){
+      // return true;
     }
     else{
 
@@ -303,14 +301,28 @@ export default class SingleTouch extends Component {
         console.log(constraintCheck)
       }
       if (constraintCheck){
-        this.setState({success:true})
-        storeData(this.props.level.name, {movement : this.state.movement})
-        this.playSuccessSound();
+        constraintAll = true;
+
       }
       else{
-        this.setState({failure:true})
-          this.playErrorSound();
+        constraintAll = false;
+
       }
+    }
+
+
+    if (this.props.level.squarePieces?.length > 0){
+      constraintAll = constraintAll && this.checkAllSquareRules();
+    }
+
+    if (constraintAll){
+      this.setState({success:true})
+      storeData(this.props.level.name, {movement : this.state.movement},this.props.type)
+      this.playSuccessSound();
+    }
+    else{
+      this.setState({failure:true})
+      this.playErrorSound();
     }
 
 
@@ -657,7 +669,184 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
 
  }
 
+ checkAllSquareRules(){
+   let visited = [];
 
+    const remainingSquares = this.props.level.squarePieces.slice();
+    let validBool = true;
+    while (remainingSquares.length > 0){
+      let coloursDict = {};
+
+      let squarePiece = remainingSquares.pop();
+      let coord = this.translateIndexToLocation(squarePiece.location.index);
+      this.checkAllDirectionsSquare(coord,visited,coloursDict)
+      if (debug){
+
+
+        console.log("evaluating square")
+        console.log(squarePiece)
+        console.log("Found the following colours");
+        console.log(JSON.stringify(coloursDict));
+      }
+      if (Object.keys(coloursDict).length > 1){
+        return false;
+      }
+
+    }
+    return true
+
+ }
+ checkAllDirectionsSquare(coord, visited,coloursDict){
+
+  if (visited.some((ele) => ele[0] == coord[0] && ele[1] == coord[1])){
+    return;
+  }
+  //piece is valid here
+  this.props.level.squarePieces.some((ele) => {
+    let coordSquare = this.translateIndexToLocation(ele.location.index);
+    if (coordSquare[0] == coord[0] && coordSquare[1] == coord[1]){
+        if (ele.colour in coloursDict){
+          coloursDict[ele.colour]++;
+        }
+        else{
+          coloursDict[ele.colour] = 1;
+        }
+    }
+
+  })
+
+
+  this.checkSquareRules("up",coord[0],coord[1],visited,coloursDict)
+  this.checkSquareRules("left",coord[0],coord[1],visited,coloursDict)
+  this.checkSquareRules("right",coord[0],coord[1],visited,coloursDict)
+  this.checkSquareRules("down",coord[0],coord[1],visited,coloursDict)
+
+  visited.push(coord);
+  console.log("VISITED")
+  console.log(JSON.stringify(visited));
+ }
+
+ translateIndexToLocation(index){
+  
+  
+  let originalX = index % this.props.level.columns;
+  let originalY = Math.floor(index / this.props.level.columns);
+  let originalXLoc = originalX * (this.state.padding + this.state.width) + this.state.padding;
+  let originalYLoc = originalY * (this.state.padding + this.state.height) + this.state.padding + this.state.offset;
+
+  return [originalXLoc,originalYLoc];
+ }
+
+ checkSquareRules(direction,currentX,currentY, visited,coloursDict){
+  // console.log(currentX,currentY)
+  if (  currentX >= WIDTH ||currentX <= 0 || currentY <= this.state.heightTop || currentY >=  this.state.heightTop + WIDTH  ){
+    return;
+  }
+  
+  if (visited.some((ele) => ele[0] == currentX && ele[1] == currentY)){
+    return;
+  }
+
+
+
+
+
+  let yCoordOfPath = 0;
+  let xCoordOfPath = 0;
+  let nextBlock = false; 
+  let xCoordOfPathEnd = 0;
+  let yCoordOfPathEnd = 0;
+  let hitEdge  = currentY - this.state.width < 0 ;
+  let nextX = 0;
+  let nextY = 0;
+
+  switch (direction){
+    case "up":
+      xCoordOfPath = currentX - this.state.padding;
+        yCoordOfPath = currentY - this.state.padding;
+      yCoordOfPathEnd = yCoordOfPath;
+      xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
+      hitEdge  = currentY - (this.state.width + this.state.padding) <= this.state.heightTop ;
+      nextX = currentX;
+      nextY = currentY- (this.state.padding + this.state.width); 
+
+      break;
+    case "down":
+      xCoordOfPath = currentX - this.state.padding;
+        yCoordOfPath = currentY + this.state.width;
+      yCoordOfPathEnd = yCoordOfPath;
+      xCoordOfPathEnd = xCoordOfPath + this.state.width + this.state.padding;
+      hitEdge  = currentY + this.state.width + this.state.padding >= this.state.heightTop + (this.state.height + this.state.padding) * this.props.level.rows;
+
+
+      nextX = currentX;
+      nextY = currentY + this.state.padding + this.state.width;
+      console.log("DOWN", nextX,nextY)
+
+      break;
+    case "left":
+      xCoordOfPath = currentX - this.state.padding;
+        yCoordOfPath = currentY - this.state.padding;
+      yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
+      xCoordOfPathEnd = xCoordOfPath; 
+      hitEdge  = currentX - (this.state.width + this.state.padding) <= 0 ;
+      nextX = currentX - (this.state.padding + this.state.width);
+      nextY = currentY; 
+      break;
+    case "right":
+      xCoordOfPath = currentX + this.state.width;
+        yCoordOfPath = currentY - this.state.padding;
+      yCoordOfPathEnd = yCoordOfPath + this.state.width + this.state.padding;
+      xCoordOfPathEnd = xCoordOfPath; 
+      hitEdge  = currentX + this.state.width + this.state.padding >= this.state.validPathsX[this.state.validPathsX.length - 1] ;
+      nextX = currentX + this.state.padding + this.state.width;
+      nextY = currentY;
+      break;
+
+  }
+
+  //conditions for multpile pieces
+    //1. Has to border with eachother
+    //2. fill up all squares
+
+
+  //check if hit border after applying direction
+
+  if (debug){
+    console.log(xCoordOfPath,yCoordOfPath);
+    console.log("--------------------------");
+    console.log(xCoordOfPathEnd,yCoordOfPathEnd)
+
+  }
+  let borderCondition = (this.state.movement.slice(0,this.state.movement.length - 1).some(
+    (ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
+   (this.state.movement[index + 1][0] ==  xCoordOfPathEnd && this.state.movement[index + 1][1] ==  yCoordOfPathEnd 
+    || 
+   this.state.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.state.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd
+    
+    )
+   ) 
+  );
+  // if (hitEdge){
+  //   console.log("hit edge, exit true")
+  //   return true;
+  // }
+
+  visited.push([currentX,currentY]);
+
+    if (borderCondition){
+      return;
+
+    }
+    else if (hitEdge){
+      console.log("Hit Edge")
+    }
+    else{
+      console.log("CHECK NEXT BLOCK FOR SQUARE")
+      let next = [nextX,nextY];
+      this.checkAllDirectionsSquare(next,visited,coloursDict)
+    }; 
+ }
 
 
 createGrid(state){
@@ -724,11 +913,27 @@ createGrid(state){
 
   state.validPathsX = validPathsX;
   state.validPathsY = validPathsY;
-  // console.log(validPathsX,validPathsY);
-  
-  
-  state.fullWidth = (this.state.padding * (this.state.validPathsX.length - 1) + (this.state.validPathsX.length - 1)* this.state.width);
+
+   state.fullWidth = (this.state.padding * (this.state.validPathsX.length - 1) + (this.state.validPathsX.length - 1)* this.state.width);
    state.gridLocations = gridLocations;
+  state.endX = state.fullWidth;
+
+  if(this.props.level.startLocation){
+    let startX = validPathsX[this.props.level.startLocation[0]];
+    let startY = validPathsY[this.props.level.startLocation[1]];
+    state.x = startX
+    state.y = startY
+    state.startX = startX;
+    state.startY = startY;
+  }
+  if(this.props.level.endLocation){
+    let endX = validPathsX[this.props.level.endLocation[0]];
+    let endY = validPathsY[this.props.level.endLocation[1]];
+    state.endX = endX;
+    state.endY = endY;
+  }
+  
+  
 
 }
 

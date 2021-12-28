@@ -62,9 +62,9 @@ export default class PuzzlePanel extends Component {
 		let paddingWithOverlap = padding + overlap * 2;
 		//populate the path taken so far in a list of views
 		const viewPath = [];
-		const initialCircle = <View style = {{position: "absolute", left: -5, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
+		const initialCircle = <View style = {{position: "absolute", left: this.props.startX -5, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
 		width: paddingWithOverlap + padding,
-	   top: this.props.offset + this.props.fullHeight -overlap - padding + 5, backgroundColor: "blue", zIndex: 2}}></View>
+	   top: this.props.startY -overlap - padding + 5, backgroundColor: "blue", zIndex: 2}}></View>
 		
 		let index = 1; 
 		if (this.props.movement.length > 0){
@@ -127,7 +127,14 @@ export default class PuzzlePanel extends Component {
 		const gridWithPieces = [];
 		const gameObj = this;
 		this.props.gridLocations.forEach(function(ele,ind){
-			let associatedTetrisPiece = gameObj.props.level.tetrisPieces.find((ele) => ele.location.index == ind)
+			let associatedTetrisPiece = null;
+			let associatedSquarePiece = null;
+			if (gameObj.props.level.tetrisPieces?.length > 0){
+				 associatedTetrisPiece = gameObj.props.level.tetrisPieces.find((ele) => ele.location.index == ind)
+			}
+			if (gameObj.props.level.squarePieces?.length > 0){
+				associatedSquarePiece = gameObj.props.level.squarePieces.find((ele) => ele.location.index == ind)
+		   }
 			let square =         <View 
 			style= {{position: "absolute",left: ele.x, top: ele.y, width: ele.width, 
 			height:ele.height, backgroundColor: "grey", justifyContent: "center", alignItems: "center",
@@ -144,7 +151,9 @@ export default class PuzzlePanel extends Component {
 			height:ele.height,
 			borderWidth: 0}} source={associatedTetrisPiece.img}  />
 			
-				} 
+				}
+
+		{associatedSquarePiece && <View style= {{backgroundColor:associatedSquarePiece.colour, width:ele.width/4,height:ele.width/4}}></View>} 
 			</View>;
 
 

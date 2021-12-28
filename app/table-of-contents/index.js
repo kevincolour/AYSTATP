@@ -35,7 +35,7 @@ export default class TableOfContents extends Component {
       let tasks = refs
         .map(r => this.refs[r])
         .filter(r => r)
-        .map(r => r.fadeOutLeft(400));
+        .map(r => r.fadeOutLeft(150));
 
       await Promise.all(tasks);
 
@@ -61,8 +61,8 @@ export default class TableOfContents extends Component {
       let tasks = refs
         .map(r => this.refs[r])
         .filter(r => r)
-        .map(r => r.fadeOutRight(400))
-        .concat([backButton.fadeOutLeft(400)]);
+        .map(r => r.fadeOutRight(150))
+        .concat([backButton.fadeOutLeft(150)]);
 
       await Promise.all(tasks);
 

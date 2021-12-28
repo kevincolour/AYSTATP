@@ -7,8 +7,8 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const imageOffset = 30;
 const WinImageObject = (props) => {
-    return	<Image style ={{position: "absolute",left: props.fullWidth - imageOffset/2,
-		 top: props.offset - imageOffset/2 + 5, width: props.padding + imageOffset,height:props.padding + imageOffset, 
+    return	<Image style ={{position: "absolute",left: props.endX - imageOffset/2,
+		 top: props.endY - imageOffset/2 + 5, width: props.padding + imageOffset,height:props.padding + imageOffset, 
 		borderWidth: 0, justifyContent: "center", alignItems: "center", zIndex: 10}}
 	
 	source={require("../../assets/StarPicture.png")}/>
@@ -36,11 +36,7 @@ const RedoImageObject = (props) => {
     hitSlop = {20}
     style={({ pressed }) => [
     {
-      // backgroundColor: pressed
-      // ? 'rgb(210, 230, 255)'
-      // : 'white'
     },
-    // styles.wrapperCustom
     ]}>
     {({ pressed }) => (
                 <Animatable.Image
@@ -59,7 +55,7 @@ source={require("../../assets/redo-solid.png")}
     
 }
 
-const NextImageObject = (props) => {
+const NextImageObject = (props, type) => {
 
   React.useEffect(() =>  {
     
@@ -70,16 +66,13 @@ const NextImageObject = (props) => {
   },[props.name])
 
     const image= useRef();
-    const buttonPressed = () =>{
-        console.log("here");
-    }
     const shouldShow = props.success
     return ( shouldShow && 
      <View style = {{...buttonStyle(props), left:WIDTH - 50}}>
 
 			<Pressable
 				onPress={() => {
-					props.loadNext(1);
+					props.loadNext(1,props.type);
 				}}
         hitSlop={20}
 				style={({ pressed }) => [
@@ -121,7 +114,7 @@ const PreviousImageObject = (props) => {
 			<Pressable
       hitSlop={20}
 				onPress={() => {
-					props.loadNext(-1);
+					props.loadNext(-1,props.type);
 				}}
 				style={({ pressed }) => [
 				{
