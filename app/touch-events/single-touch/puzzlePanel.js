@@ -120,7 +120,9 @@ export default class PuzzlePanel extends Component {
 		}
 		//populate line so far
 		//going up
+		// console.log("lasttseenY");
 		// console.log(lastSeenY, this.props.y);
+		// console.log("lasttseenX");
 		// console.log(lastSeenX,this.props.x)
 
 		if (lastSeenY > this.props.y){
@@ -134,7 +136,7 @@ export default class PuzzlePanel extends Component {
 		}
 		else if(lastSeenX < this.props.x){
 			// if(lastSeenX < this.props.x){
-				
+			
 				pathStyle.top = closestY;
 				pathStyle.height = paddingWithOverlap
 				pathStyle.left = lastSeenX;
