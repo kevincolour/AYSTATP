@@ -63,16 +63,26 @@ export default class SingleTouch extends Component {
 
     // console.log("update")
     if (move) {
+
+      
       const forgive = this.state.width / 5;
       // const forgive = 10;
       const slack = 2;
       const sizeOfLine = this.state.padding;      
-    
-      console.log(JSON.stringify(this.state.movement));
-      let newX =(Math.min(this.state.fullWidth,Math.max(0,this.state.x +  move.delta.pageX))); 
-      let newY =(Math.min(this.state.fullHeight + this.state.offset,Math.max(this.state.offset,this.state.y +  move.delta.pageY))); 
       
-      console.log(newX,newY)
+      const moveXCap = Math.min(Math.abs(move.delta.pageX),forgive);
+      const moveYCap = Math.min(Math.abs(move.delta.pageY),forgive);
+
+      const moveX = move.delta.pageX > 0 ? moveXCap : moveXCap * -1 ;
+      const moveY = move.delta.pageY > 0 ? moveYCap : moveYCap * -1 ;
+
+      console.log(moveX,moveY);
+
+      console.log(JSON.stringify(this.state.movement));
+      let newX =(Math.min(this.state.fullWidth,Math.max(0,this.state.x +  moveX))); 
+      let newY =(Math.min(this.state.fullHeight + this.state.offset,Math.max(this.state.offset,this.state.y +  moveY))); 
+      
+      // console.log(newX,newY)
 
 
       let restrictedX = newX;
@@ -89,8 +99,8 @@ export default class SingleTouch extends Component {
         let validY = this.state.validPathsY.find((ele) => ele - slack < newY && newY < ele + slack);
 
         if(validY){
-          console.log("NEWY TRIGGER")
-          console.log(newY);
+          // console.log("NEWY TRIGGER")
+          // console.log(newY);
           if(!(this.state.movement.length > 0 && previousMovement[0] == closestX && previousMovement[1] == validY)){
               this.trackMovement([closestX,validY]);
             this.setState({x:closestX,y:validY})
@@ -115,8 +125,8 @@ export default class SingleTouch extends Component {
                 //check if intersection
               let validX  =this.state.validPathsX.find((ele) => ele - slack < newX && newX < ele + slack);
         if(validX || validX == 0){
-          console.log("NEWX TRIGGER")
-          console.log(newX);
+          // console.log("NEWX TRIGGER")
+          // console.log(newX);
           if(!(this.state.movement.length > 0 && previousMovement[0] == validX && previousMovement[1] == closestY)){
             this.trackMovement([validX,closestY]);
             this.setState({x:validX,y:closestY})
