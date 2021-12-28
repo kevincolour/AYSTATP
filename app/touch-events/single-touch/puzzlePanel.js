@@ -114,12 +114,15 @@ export default class PuzzlePanel extends Component {
 
 		
 		let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
+		let lastSeenX = this.props.movement[this.props.movement.length-1][0];
 		let pathStyle = {
 			position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
 		}
 		//populate line so far
 		//going up
 		// console.log(lastSeenY, this.props.y);
+		// console.log(lastSeenX,this.props.x)
+
 		if (lastSeenY > this.props.y){
 			// console.log("here")
 			pathStyle.top = this.props.y;
@@ -128,6 +131,24 @@ export default class PuzzlePanel extends Component {
 		else if (lastSeenY < this.props.y){
 			pathStyle.top = lastSeenY ;
 			pathStyle.height =  this.props.y - lastSeenY + this.props.padding;
+		}
+		else if(lastSeenX < this.props.x){
+			// if(lastSeenX < this.props.x){
+				
+				pathStyle.top = closestY;
+				pathStyle.height = paddingWithOverlap
+				pathStyle.left = lastSeenX;
+				pathStyle.width =  this.props.x - lastSeenX + this.props.padding;
+
+		}
+		else if(lastSeenX > this.props.x){
+			// if(lastSeenX < this.props.x){
+				
+				pathStyle.top = closestY;
+				pathStyle.height = paddingWithOverlap
+				pathStyle.left = this.props.x;
+				pathStyle.width =  lastSeenX - this.props.x + this.props.padding;
+
 		}
 
 		// let lastSeenX = this.props.movement[this.props.movement.length- 1][0];

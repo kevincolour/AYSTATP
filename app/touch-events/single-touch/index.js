@@ -50,31 +50,38 @@ export default class SingleTouch extends Component {
     this.setState({renderComplete : complete})
   }
 
+  checkIfbetween(lower, upper, value){
+    let bool = (lower < value && value < upper) || (upper < value && value < lower); 
+    if (bool){
+      console.log(lower, value, upper)
+    }
+    return bool;
+  }
+
   onUpdate = ({ touches }) => {
     let move = touches.find(x => x.type === "move");
-    const forgive = this.state.width / 10;
-    const slack = 15;
+
     // console.log("update")
     if (move) {
+      const forgive = this.state.width / 5;
+      // const forgive = 10;
+      const slack = 2;
+      const sizeOfLine = this.state.padding;      
+    
       console.log(JSON.stringify(this.state.movement));
-      
       let newX =(Math.min(this.state.fullWidth,Math.max(0,this.state.x +  move.delta.pageX))); 
       let newY =(Math.min(this.state.fullHeight + this.state.offset,Math.max(this.state.offset,this.state.y +  move.delta.pageY))); 
       
-     
-        // console.log(newX,newY) 
-        // console.log("validPathX",JSON.stringify(this.state.validPathsX))
-        // console.log("validPAthY" , JSON.stringify(this.state.validPathsY))
+      console.log(newX,newY)
 
-      //on an X path, stifle Y movement
-      // if (this.state.validPathsx.some((ele)=> ele == newY)){
-      //   var closestY = this.state.validPathsY.reduce(function(prev, curr) {
-      //     return (Math.abs(curr - newY) < Math.abs(prev - newY) ? curr : prev);
-      //   });
-      //   newY = closestY
-      // }
+
       let restrictedX = newX;
-      if (this.state.validPathsX.some((ele) => ele - forgive < newX && newX < ele + forgive)){
+
+      let previousMovement = this.state.movement[this.state.movement.length -1];
+      let previousPreviousMovement = this.state.movement.length > 1 ? this.state.movement[this.state.movement.length - 2] : null;
+
+  
+      if (this.state.validPathsX.some((ele) => ele - forgive <= newX && newX <= ele + forgive)){
         var closestX = this.state.validPathsX.reduce(function(prev, curr) {
           return (Math.abs(curr - newX) < Math.abs(prev - newX) ? curr : prev);
         });
@@ -82,12 +89,16 @@ export default class SingleTouch extends Component {
         let validY = this.state.validPathsY.find((ele) => ele - slack < newY && newY < ele + slack);
 
         if(validY){
-          if(!this.state.movement.some((ele) => ele[0] == closestX && ele[1] == validY)){
-              // this.state.movement.push([closestX,validY])
+          console.log("NEWY TRIGGER")
+          console.log(newY);
+          if(!(this.state.movement.length > 0 && previousMovement[0] == closestX && previousMovement[1] == validY)){
               this.trackMovement([closestX,validY]);
+            this.setState({x:closestX,y:validY})
+              return;
             }   
           }
           else{
+
             restrictedX = closestX
           }
         
@@ -95,7 +106,7 @@ export default class SingleTouch extends Component {
       newX= restrictedX
 
       let restrictedY = newY;
-      if(this.state.validPathsY.some((ele) => ele - forgive < newY && newY < ele + forgive)){
+      if(this.state.validPathsY.some((ele) => ele - forgive <= newY && newY <= ele + forgive)){
         var closestY = this.state.validPathsY.reduce(function(prev, curr) {
           return (Math.abs(curr - newY) < Math.abs(prev - newY) ? curr : prev);
         });
@@ -104,9 +115,12 @@ export default class SingleTouch extends Component {
                 //check if intersection
               let validX  =this.state.validPathsX.find((ele) => ele - slack < newX && newX < ele + slack);
         if(validX || validX == 0){
-          if( !this.state.movement.some((ele) => ele[0] == validX && ele[1] == closestY)){
-            // this.state.movement.push([validX,closestY])
+          console.log("NEWX TRIGGER")
+          console.log(newX);
+          if(!(this.state.movement.length > 0 && previousMovement[0] == validX && previousMovement[1] == closestY)){
             this.trackMovement([validX,closestY]);
+            this.setState({x:validX,y:closestY})
+            return;
             }
           }
           else{
@@ -114,6 +128,15 @@ export default class SingleTouch extends Component {
           }
       }
       newY = restrictedY
+
+
+          //invalid - between two intersections -> pop
+          if (previousPreviousMovement && (this.checkIfbetween(previousMovement[0],previousPreviousMovement[0], newX)
+          || this.checkIfbetween(previousMovement[1],previousPreviousMovement[1], newY))
+        ){
+          console.log("here")
+        } 
+  
 
 
       // if(this.state.validPathsY.some((ele) => ele - slack < newY && newY < ele + slack)){
@@ -150,7 +173,7 @@ export default class SingleTouch extends Component {
   trackMovement = (val) => {
 
     
-    console.log(this.state.x,this.state.y);
+    console.log(val[0],val[1]);
     //val is an intersection, can't touch intersection more than once
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
@@ -212,12 +235,12 @@ export default class SingleTouch extends Component {
 
 		//check if player reversed route ! 
 
-		if (previousX == val[0] && previousY == val[1]){
-				this.state.movement.pop();
-		}
+		// if (previousX == val[0] && previousY == val[1]){
+		// 		this.state.movement.pop();
+		// }
 
     //check if player is travelling to a path already travelled
-    else if(invalidMovement){
+   if(invalidMovement){
       console.log("INVALID MOVMEENT")
       console.log(val[0],val[1])
           this.setState ({
