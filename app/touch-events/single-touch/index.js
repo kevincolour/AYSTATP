@@ -19,6 +19,7 @@ const debug = false;
 const storeData = async (key,value, type) => {
   try {
     if (value){
+      console.log('@level_' + type + "_" + key);
       await AsyncStorage.setItem('@level_' + type + "_" + key, JSON.stringify(value));
 
     }
@@ -30,6 +31,8 @@ const storeData = async (key,value, type) => {
 
 const getData = async (key,type) => {
   try {
+    console.log('@level_' + type + "_" + key);
+
     const jsonValue = await AsyncStorage.getItem('@level_' + type + "_" + key)
     return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch(e) {
@@ -45,10 +48,10 @@ export default class SingleTouch extends Component {
     try {
 
       let levelData =  await getData(this.state.name,this.props.type);
-      levelData = null;
       if (levelData){
         if(levelData.movement){
           const lastMovement = levelData.movement[levelData.movement.length-1];
+
           this.setState({movement: levelData.movement,success:true,x:lastMovement[0],y:lastMovement[1]})
         }
       }
@@ -125,15 +128,78 @@ export default class SingleTouch extends Component {
       await sound.playAsync();
   }
 
+  checkIfbetween(lower, upper, value){
+    let offset = 20;
+    let bool = (lower + offset < value && value < upper -offset) || (upper +offset < value && value < lower - offset); 
+    if (bool){
+      console.log(lower, value, upper)
+    }
+    return bool;
+  }
+
   onUpdate = ({ touches }) => {
     let move = touches.find(x => x.type === "move");
-   
+
+    // console.log("update")
     if (move) {
 
       
-      let newX =(Math.min(this.state.fullWidth,Math.max(0,this.state.x +  move.delta.pageX))); 
-      let newY =(Math.min(this.state.fullHeight + this.state.offset,Math.max(this.state.offset,this.state.y +  move.delta.pageY))); 
+      const slack = 15;
+
+      const moveXCap = (Math.abs(move.delta.pageX));
+      const moveYCap = (Math.abs(move.delta.pageY));
+
+      const moveX = move.delta.pageX > 0 ? moveXCap : moveXCap * -1 ;
+      const moveY = move.delta.pageY > 0 ? moveYCap : moveYCap * -1 ;
+
+
+      console.log(JSON.stringify(this.state.movement));
+      let newX =(Math.min(this.state.fullWidth,Math.max(0,this.state.x +  moveX))); 
+      let newY =(Math.min(this.state.fullHeight + this.state.offset,Math.max(this.state.offset,this.state.y +  moveY))); 
       
+      let previousMovement = this.state.movement[this.state.movement.length -1];
+      let previousPreviousMovement = this.state.movement.length > 1 ? this.state.movement[this.state.movement.length - 2] : null;
+
+
+      // console.log(newX,newY)
+      let onXCoordVal = this.state.validPathsX.find((ele) => ele - slack < this.state.x && this.state.x < ele + slack);
+      let onXCoordBool = onXCoordVal == 0 || onXCoordVal;
+      let onYCoord = this.state.validPathsY.find((ele) => ele - slack < this.state.y && this.state.y < ele + slack);
+      if (onXCoordBool && onYCoord ){
+        if (!(this.state.movement.length > 0 && previousMovement[0] == onXCoordVal && previousMovement[1] == onYCoord)){
+
+            this.trackMovement([onXCoordVal,onYCoord])
+            return;
+        }
+        
+        if (moveXCap> moveYCap){
+          newY = onYCoord
+          
+        }
+        else{
+          newX = onXCoordVal
+        }
+
+      }
+      else if (onXCoordBool){
+        newX = onXCoordVal;
+      }
+      else if (onYCoord){
+        newY = onYCoord
+      }
+
+ 
+          //invalid - between two intersections -> pop
+          if (previousPreviousMovement && (this.checkIfbetween(previousMovement[0],previousPreviousMovement[0], newX)
+          || this.checkIfbetween(previousMovement[1],previousPreviousMovement[1], newY))
+        ){
+          console.log("REVERSED, INVALID")
+          this.setState({movement : this.state.movement.slice(0,-1 )})
+        } 
+  
+
+
+
       this.setState({
         x: newX,
         y: newY
@@ -151,6 +217,9 @@ export default class SingleTouch extends Component {
   }
 
   trackMovement = (val) => {
+
+    
+    console.log(val[0],val[1]);
     //val is an intersection, can't touch intersection more than once
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
@@ -215,14 +284,14 @@ export default class SingleTouch extends Component {
 
 		//check if player reversed route ! 
 
-		if (previousX == val[0] && previousY == val[1]){
-				this.setState({movement: this.state.movement.slice(0,this.state.movement.length - 1 - 1)})
-		}
+		// if (previousX == val[0] && previousY == val[1]){
+		// 		this.state.movement.pop();
+		// }
 
     //check if player is travelling to a path already travelled
-    else if(invalidMovement){
+   if(invalidMovement){
       console.log("INVALID MOVMEENT")
-      console.log(val[0],val[1])
+      console.log(currentLocation[0],currentLocation[1])
           this.setState ({
             x: currentLocation[0],
             y: currentLocation[1],

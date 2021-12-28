@@ -5,7 +5,8 @@ import {WinImageObject,RedoImageObject,PreviousImageObject,NextImageObject} from
 import * as Animatable from "react-native-animatable";
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
-const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
+// const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
+const BODY_DIAMETER = 20;
 const BORDER_WIDTH = Math.trunc(BODY_DIAMETER * 0.1);
 const COLORS = ["#86E9BE", "#8DE986", "#B8E986", "#E9E986"];
 const BORDER_COLORS = ["#C0F3DD", "#C4F6C0", "#E5FCCD", "#FCFDC1"];
@@ -48,14 +49,18 @@ export default class PuzzlePanel extends Component {
 		let lastKnownX = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][0];
 		let lastKnownY = this.props.movement.length == 0 ? Number.MIN_SAFE_INTEGER : this.props.movement[this.props.movement.length - 1][1];
 
-
-
-		//new x coord
-			if (lastKnownX != closestX || lastKnownY != closestY){
-			//track last known 
+		if(this.props.movement.length == 0){
 			let newCoordArray = [closestX,closestY];
 			this.props.trackMovementFunc(newCoordArray);
 		}
+
+
+		// //new x coord
+		// 	if (lastKnownX != closestX || lastKnownY != closestY){
+		// 	//track last known 
+		// 	let newCoordArray = [closestX,closestY];
+		// 	this.props.trackMovementFunc(newCoordArray);
+		// }
 
 
 		let overlap = 1;
@@ -110,20 +115,62 @@ export default class PuzzlePanel extends Component {
 			}
 		}
 		
-	
-		// let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
+		let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
+		let lastSeenX = this.props.movement[this.props.movement.length-1][0];
+		let pathStyle = {
+			position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
+		}
+		//populate line so far
+		//going up
+		// console.log("lasttseenY");
+		// console.log(lastSeenY, this.props.y);
+		// console.log("lasttseenX");
+		// console.log(lastSeenX,this.props.x)
+
+		if (lastSeenY > this.props.y){
+			// console.log("here")
+			pathStyle.top = this.props.y;
+			pathStyle.height = lastSeenY - this.props.y + this.props.padding;
+		}
+		else if (lastSeenY < this.props.y){
+			pathStyle.top = lastSeenY ;
+			pathStyle.height =  this.props.y - lastSeenY + this.props.padding;
+		}
+		else if(lastSeenX < this.props.x){
+			// if(lastSeenX < this.props.x){
+			
+				pathStyle.top = closestY;
+				pathStyle.height = paddingWithOverlap
+				pathStyle.left = lastSeenX;
+				pathStyle.width =  this.props.x - lastSeenX + this.props.padding;
+
+		}
+		else if(lastSeenX > this.props.x){
+			// if(lastSeenX < this.props.x){
+				
+				pathStyle.top = closestY;
+				pathStyle.height = paddingWithOverlap
+				pathStyle.left = this.props.x;
+				pathStyle.width =  lastSeenX - this.props.x + this.props.padding;
+
+		}
+
+		// let lastSeenX = this.props.movement[this.props.movement.length- 1][0];
 		// let pathStyle = {
-		// 	position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
+		// 	position: "absolute", left: closestY, left: lastSeenX, height: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
 		// }
 		// //populate line so far
 		// //going up
 		// // console.log(lastSeenY, this.props.y);
-		// if (lastSeenY > this.props.y){
+		// if (lastSeenX > this.props.x){
 		// 	// console.log("here")
-		// 	pathStyle.top = this.props.y;
+		// 	pathStyle.left = this.props.x;
 		// 	pathStyle.height = lastSeenY - this.props.y + this.props.padding;
 		// }
-		// const lineProgress = <View style ={pathStyle}></View>
+
+		const lineProgress = <View style ={pathStyle}></View>
+
+
 		const gridWithPieces = [];
 		const gameObj = this;
 		this.props.gridLocations.forEach(function(ele,ind){
@@ -191,6 +238,8 @@ export default class PuzzlePanel extends Component {
 
 				{viewPath}
 			</Animatable.View> : viewPath}
+			{lineProgress}
+			{viewPath} 	
 			{gaps}
 			{nextImage}
 			{previousImage}
