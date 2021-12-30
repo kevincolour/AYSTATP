@@ -65,11 +65,12 @@ export default class PuzzlePanel extends Component {
 
 		let overlap = 1;
 		let paddingWithOverlap = padding + overlap * 2;
+		let startWidth = paddingWithOverlap + padding;
 		//populate the path taken so far in a list of views
 		const viewPath = [];
-		const initialCircle = <View style = {{position: "absolute", left: this.props.startX -5, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
+		const initialCircle = <View style = {{position: "absolute", left: this.props.startX - startWidth/4, borderRadius: 10 + padding, height: paddingWithOverlap + padding  ,
 		width: paddingWithOverlap + padding,
-	   top: this.props.startY -overlap - padding + 5, backgroundColor: "blue", zIndex: 2}}></View>
+	   top: this.props.startY - startWidth/4, backgroundColor: "#0000cc", zIndex: 2}}></View>
 		
 		let index = 1; 
 		if (this.props.movement.length > 0){
@@ -118,7 +119,7 @@ export default class PuzzlePanel extends Component {
 		let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
 		let lastSeenX = this.props.movement[this.props.movement.length-1][0];
 		let pathStyle = {
-			position: "absolute", left: closestX, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
+			position: "absolute", left: closestX - overlap, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
 		}
 		//populate line so far
 		//going up
@@ -139,7 +140,7 @@ export default class PuzzlePanel extends Component {
 		else if(lastSeenX < this.props.x){
 			// if(lastSeenX < this.props.x){
 			
-				pathStyle.top = closestY;
+				pathStyle.top = closestY - overlap;
 				pathStyle.height = paddingWithOverlap
 				pathStyle.left = lastSeenX;
 				pathStyle.width =  this.props.x - lastSeenX + this.props.padding;
@@ -148,28 +149,14 @@ export default class PuzzlePanel extends Component {
 		else if(lastSeenX > this.props.x){
 			// if(lastSeenX < this.props.x){
 				
-				pathStyle.top = closestY;
+				pathStyle.top = closestY - overlap;
 				pathStyle.height = paddingWithOverlap
 				pathStyle.left = this.props.x;
 				pathStyle.width =  lastSeenX - this.props.x + this.props.padding;
 
 		}
 
-		// let lastSeenX = this.props.movement[this.props.movement.length- 1][0];
-		// let pathStyle = {
-		// 	position: "absolute", left: closestY, left: lastSeenX, height: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
-		// }
-		// //populate line so far
-		// //going up
-		// // console.log(lastSeenY, this.props.y);
-		// if (lastSeenX > this.props.x){
-		// 	// console.log("here")
-		// 	pathStyle.left = this.props.x;
-		// 	pathStyle.height = lastSeenY - this.props.y + this.props.padding;
-		// }
-
 		const lineProgress = <View style ={pathStyle}></View>
-
 
 		const gridWithPieces = [];
 		const gameObj = this;
@@ -208,22 +195,23 @@ export default class PuzzlePanel extends Component {
 		})
 		const gaps = [];
 		const paths = this.props.validPathsX;
+		const size = 10;
 		this.props.gaps.forEach((ele,ind)=>{
 			let isYGap = paths.some((path) => path == ele[0]);
-			let  gap = <View key = {ind} style ={{position:"absolute", backgroundColor: "white", width: (isYGap? this.props.padding : this.props.width /2),
-			 height:(isYGap? this.props.width /2:  this.props.padding ),	left:ele[0] - (isYGap ? 0 : (this.props.width /2) /2) ,top: ele[1] - (isYGap ? (this.props.width /2) /2 : 0)
+			let  gap = <View key = {ind} style ={{position:"absolute", backgroundColor: "white", width: (isYGap? this.props.padding : size),
+			 height:(isYGap? size:  this.props.padding ),	left:ele[0] - (isYGap ? 0 : (size/2)) ,top: ele[1] - (isYGap ? (size /2) /2 : 0)
 		}}>
 
 		</View>
 			gaps.push(gap);
 		})
-		const winImage = <WinImageObject {...this.props}/>
+
+		const winProps = {...this.props, paddingWithOverlap, startWidth};
+		const winImage = <WinImageObject {...winProps} />
 		const redoImage = <RedoImageObject {...this.props}/>
 		const previousImage = <PreviousImageObject {...this.props}/>
 		const nextImage = <NextImageObject {...this.props}/>
 	  
-
-		 
 		return (
 			<>
 			
@@ -234,12 +222,11 @@ export default class PuzzlePanel extends Component {
 			{gridWithPieces}
 			{initialCircle}
 			{this.props.failure ?
-			<Animatable.View onAnimationEnd={() => this.props.onFailedPath()} duration={2000} animation={"fadeOut"}>
+			<Animatable.View onAnimationEnd={() => this.props.onFailedPath()} duration={1000} animation={"fadeOut"}>
 
 				{viewPath}
 			</Animatable.View> : viewPath}
 			{lineProgress}
-			{viewPath} 	
 			{gaps}
 			{nextImage}
 			{previousImage}
@@ -346,7 +333,8 @@ const css = StyleSheet.create({
 		width: BODY_DIAMETER,
 		height: BODY_DIAMETER,
 		position: "absolute",
-		borderRadius: BODY_DIAMETER * 2
+		borderRadius: BODY_DIAMETER * 2,
+		zIndex : 100
 	},
 	lead: {
 		opacity: 1,

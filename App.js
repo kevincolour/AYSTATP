@@ -6,6 +6,9 @@ import EStyleSheet from "react-native-extended-stylesheet";
 import TableOfContents from "./app/table-of-contents";
 import SingleTouch from "./app/touch-events/single-touch";
 import {levels} from "./app/definitions/tetrisLevels";
+import {squareLevels} from "./app/definitions/squareLevels";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import LevelSelect from "./app/touch-events";
 
 EStyleSheet.build();
 
@@ -17,19 +20,52 @@ console.disableYellowBox = true;
 
 
 export default class App extends Component {
+
+
+  async componentDidMount() {
+    try{
+       
+      const maxLevel = parseInt(await AsyncStorage.getItem('@levelMax_tetris'));
+      if (maxLevel){
+        
+        if (maxLevel <= levels.length - 1){
+          this.setState({maxValue:maxLevel,currentLevelIndex:maxLevel})
+        }
+        else{
+          await AsyncStorage.removeItem('@levelMax_tetris');
+        }
+      }
+      const maxLevelSquare = parseInt(await AsyncStorage.getItem('@levelMax_square'));
+      // if (maxLevelSquare){
+        
+      //   if (maxLevelSquare <= squareLevels.length - 1){
+      //     this.setState({maxValueSquare : maxLevelSquare ,currentSquareLevelIndex :maxLevelSquare})
+      //   }
+      //   else{
+      //     await AsyncStorage.removeItem('@levelMax_square');
+      //   }
+      // }
+    }
+    finally{
+
+    }
+  }
   constructor(props) {
 
     super(props);
     this.state = {
       currentLevelIndex: 0,
+      currentSquareLevelIndex : 0,
       sceneVisible: false,
-      scene: null
+      scene: null,
+      maxValue : 0,
+      maxValueSquare : 0
     };
   }
 
   mountScene = scene => {
     this.setState({
-      sceneVisible: true,
+      sceneVisible: true,   
       scene: scene
     });
   };
@@ -44,27 +80,80 @@ export default class App extends Component {
 
 
 
-  nextLevelLoad = (increment) =>{
-    console.log(increment);
-    let newLevel = this.state.currentLevelIndex + increment;
-    if (newLevel < 0){
-      return;
+  nextLevelLoad = async (increment, type) =>{
+
+    console.log(type);
+    let newLevel = null;
+    let newLevelObj = null;
+    if (type == "square"){
+       newLevel = this.state.currentSquareLevelIndex + increment;
+       newLevelObj = squareLevels[newLevel]
+       if (newLevel < 0){
+        return;
+      }
+      const maxValue = this.state.maxValueSquare
+      if (newLevel > maxValue){
+        this.setState({maxValueSquare: maxValue});
+        await AsyncStorage.setItem('@levelMax_' + type, JSON.stringify(newLevel));
+      }
+        this.setState({currentSquareLevelIndex : newLevel})
     }
-    let newLevelComponent = <SingleTouch key = {newLevel} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
+    else if (type == "tetris"){
+      console.log(this.state.currentLevelIndex);
+      newLevel = this.state.currentLevelIndex + increment;
+      newLevelObj = levels[newLevel];
+
+      if (newLevel < 0){
+        return;
+      }
+      const maxValue = this.state.maxValue
+
+      if (newLevel > maxValue){
+        this.setState({maxValue: maxValue});
+        await AsyncStorage.setItem('@levelMax_' + type, JSON.stringify(newLevel));
+      }
+
+      this.setState({currentLevelIndex : newLevel})
+    }
+    
+
+
+  let props = {...this.getProps(type), level : newLevelObj, key :newLevel + type}
+    // let newLevelComponent = <SingleTouch key = {newLevel} type = {type} unmount = {this.unMountScene} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
+
+    let newLevelComponent = <SingleTouch {...props}/>;
     this.setState({
       sceneVisible:true,
       scene: newLevelComponent,
-      currentLevelIndex: newLevel
     })
 
   }
+  getProps = (type) => {
+    const levelProps = {
+      key: this.state.currentLevelIndex + "_" + type,
+      unmount : this.unMountScene ,
+      loadNext : this.nextLevelLoad,
+      level : levels[this.state.currentLevelIndex],
+      triggerVictory : this.triggerVictory,
+      type : "tetris"
+    }
+    console.log("LEVEL PROPS")
+    console.log(levelProps);
 
+    if (type == "square"){
+      levelProps.key = this.state.currentSquareLevelIndex + "_" + type;
+      levelProps.type = "square";
+      levelProps.level =  squareLevels[this.state.currentSquareLevelIndex]
+    }
+    return levelProps;
+  }
   // triggerVictory = () =>{
   //   this.setState({
   //     victory: true
   //   });
   // }
   render() {  
+
     return (
       
       <View style={{ flex: 1 }}>
@@ -73,10 +162,8 @@ export default class App extends Component {
           contents={{
             heading: "AYSTATP",
             items: [
-              {
-                heading: "Play",
-                onPress: _ => this.mountScene(<SingleTouch loadNext = {this.nextLevelLoad} level = {levels[this.state.currentLevelIndex]} triggerVictory = {this.triggerVictory}/>)
-              },
+              LevelSelect(this.mountScene,this.getProps)
+              ,
               {
                 heading: "Levels",
                 // onPress: _ => this.mountScene(<SingleTouch />)

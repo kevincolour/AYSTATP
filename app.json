@@ -11,9 +11,9 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "primaryColor": "#E96443",
-    "icon": "./assets/iconPlaceholder.png",
+    "icon": "./assets/iconPlaceholder2.png",
     "splash": {
-      "image": "./assets/splashPlaceholder.png",
+      "image": "./assets/splashPlaceholder2.png",
       "resizeMode": "contain",
       "backgroundColor": "#904E95"
     },

@@ -14,7 +14,7 @@ import { join } from "lodash";
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const checkAll = true;
-const debug = false;
+const debug = true;
 
 const storeData = async (key,value, type) => {
   try {
@@ -34,7 +34,8 @@ const getData = async (key,type) => {
     console.log('@level_' + type + "_" + key);
 
     const jsonValue = await AsyncStorage.getItem('@level_' + type + "_" + key)
-    return jsonValue != null ? JSON.parse(jsonValue) : null;
+    return null;
+    // return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch(e) {
     console.log("getDataError" , e)
     // error reading value
@@ -153,7 +154,7 @@ export default class SingleTouch extends Component {
       const moveY = move.delta.pageY > 0 ? moveYCap : moveYCap * -1 ;
 
 
-      console.log(JSON.stringify(this.state.movement));
+      // console.log(JSON.stringify(this.state.movement));
       let newX =(Math.min(this.state.fullWidth,Math.max(0,this.state.x +  moveX))); 
       let newY =(Math.min(this.state.fullHeight + this.state.offset,Math.max(this.state.offset,this.state.y +  moveY))); 
       
@@ -183,8 +184,19 @@ export default class SingleTouch extends Component {
       }
       else if (onXCoordBool){
         newX = onXCoordVal;
+        let yGaps = this.state.gaps.filter((ele) => ele[0] == newX);
+        //current cursor is over a gap
+        if (yGaps.some((ele) =>newY - 5 < ele[1]  && ele[1] < newY + 5)){
+          return;
+        }
       }
       else if (onYCoord){
+        let xGaps = this.state.gaps.filter((ele) => ele[1] == onYCoord);
+
+        //current cursor is over a gap
+        if (xGaps.some((ele) =>newX - 5 < ele[0]  && ele[0] < newX + slack)){
+          return;
+        }
         newY = onYCoord
       }
 
@@ -195,6 +207,8 @@ export default class SingleTouch extends Component {
         ){
           console.log("REVERSED, INVALID")
           this.setState({movement : this.state.movement.slice(0,-1 )})
+      this.setState({success: false, failure: false})
+
         } 
   
 
@@ -768,6 +782,7 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
  checkAllDirectionsSquare(coord, visited,coloursDict){
 
   if (visited.some((ele) => ele[0] == coord[0] && ele[1] == coord[1])){
+    console.log("hit visited")
     return;
   }
   //piece is valid here
@@ -790,9 +805,7 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
   this.checkSquareRules("right",coord[0],coord[1],visited,coloursDict)
   this.checkSquareRules("down",coord[0],coord[1],visited,coloursDict)
 
-  visited.push(coord);
-  console.log("VISITED")
-  console.log(JSON.stringify(visited));
+
  }
 
  translateIndexToLocation(index){
@@ -809,15 +822,11 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
  checkSquareRules(direction,currentX,currentY, visited,coloursDict){
   // console.log(currentX,currentY)
   if (  currentX >= WIDTH ||currentX <= 0 || currentY <= this.state.heightTop || currentY >=  this.state.heightTop + WIDTH  ){
+    console.log("hit Edge Square")
     return;
   }
   
-  if (visited.some((ele) => ele[0] == currentX && ele[1] == currentY)){
-    return;
-  }
-
-
-
+  
 
 
   let yCoordOfPath = 0;
@@ -886,16 +895,25 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
     console.log("--------------------------");
     console.log(xCoordOfPathEnd,yCoordOfPathEnd)
 
+      console.log(JSON.stringify(this.state.movement));
+
   }
   let borderCondition = (this.state.movement.slice(0,this.state.movement.length - 1).some(
     (ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
    (this.state.movement[index + 1][0] ==  xCoordOfPathEnd && this.state.movement[index + 1][1] ==  yCoordOfPathEnd 
-    || 
-   this.state.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.state.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd
     
     )
    ) 
   );
+
+borderCondition = borderCondition || 
+(this.state.movement.slice(0).some(
+  (ele,index) => ele[0] == xCoordOfPath && ele[1] == yCoordOfPath &&
+  (this.state.movement[Math.max(0,index -1)][0] ==  xCoordOfPathEnd && this.state.movement[Math.max(0,index -1)][1] ==  yCoordOfPathEnd)
+  )
+ )
+
+
   // if (hitEdge){
   //   console.log("hit edge, exit true")
   //   return true;
@@ -904,15 +922,19 @@ checkTetrisConstraint = (tetrisPiece, tetrisBlock, previousDirection, currentX, 
   visited.push([currentX,currentY]);
 
     if (borderCondition){
+      console.log("hit BORder")
       return;
 
     }
     else if (hitEdge){
       console.log("Hit Edge")
+      return;
     }
     else{
-      console.log("CHECK NEXT BLOCK FOR SQUARE")
+      console.log("CHECK NEXT BLOCK FOR SQUARE DIRECTION : ", direction)
       let next = [nextX,nextY];
+      console.log("VISITED")
+      console.log(JSON.stringify(visited));
       this.checkAllDirectionsSquare(next,visited,coloursDict)
     }; 
  }

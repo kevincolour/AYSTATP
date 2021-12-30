@@ -25,17 +25,26 @@ export default class App extends Component {
   async componentDidMount() {
     try{
        
-      // const maxLevel = parseInt(await AsyncStorage.getItem('@levelMax_tetris'));
-      // if (maxLevel){
+      const maxLevel = parseInt(await AsyncStorage.getItem('@levelMax_tetris'));
+      if (maxLevel){
         
-      //   if (maxLevel <= levels.length - 1){
-      //     this.setState({maxValue:maxLevel,currentLevelIndex:maxLevel})
+        if (maxLevel <= levels.length - 1){
+          this.setState({maxValue:maxLevel,currentLevelIndex:maxLevel})
+        }
+        else{
+          await AsyncStorage.removeItem('@levelMax_tetris');
+        }
+      }
+      const maxLevelSquare = parseInt(await AsyncStorage.getItem('@levelMax_square'));
+      // if (maxLevelSquare){
+        
+      //   if (maxLevelSquare <= squareLevels.length - 1){
+      //     this.setState({maxValueSquare : maxLevelSquare ,currentSquareLevelIndex :maxLevelSquare})
       //   }
       //   else{
-      //     await AsyncStorage.removeItem('@levelMax_tetris');
+      //     await AsyncStorage.removeItem('@levelMax_square');
       //   }
       // }
-
     }
     finally{
 
@@ -49,7 +58,8 @@ export default class App extends Component {
       currentSquareLevelIndex : 0,
       sceneVisible: false,
       scene: null,
-      maxValue : 0
+      maxValue : 0,
+      maxValueSquare : 0
     };
   }
 
@@ -78,26 +88,37 @@ export default class App extends Component {
     if (type == "square"){
        newLevel = this.state.currentSquareLevelIndex + increment;
        newLevelObj = squareLevels[newLevel]
+       if (newLevel < 0){
+        return;
+      }
+      const maxValue = this.state.maxValueSquare
+      if (newLevel > maxValue){
+        this.setState({maxValueSquare: maxValue});
+        await AsyncStorage.setItem('@levelMax_' + type, JSON.stringify(newLevel));
+      }
         this.setState({currentSquareLevelIndex : newLevel})
     }
     else if (type == "tetris"){
       console.log(this.state.currentLevelIndex);
       newLevel = this.state.currentLevelIndex + increment;
       newLevelObj = levels[newLevel];
+
+      if (newLevel < 0){
+        return;
+      }
+      const maxValue = this.state.maxValue
+
+      if (newLevel > maxValue){
+        this.setState({maxValue: maxValue});
+        await AsyncStorage.setItem('@levelMax_' + type, JSON.stringify(newLevel));
+      }
+
       this.setState({currentLevelIndex : newLevel})
     }
-    if (newLevel < 0){
-      return;
-    }
-    const maxValue = this.state.maxValue
+    
 
-    if (newLevel > maxValue){
-      this.setState({maxValue: maxValue});
-      await AsyncStorage.setItem('@levelMax_' + type, JSON.stringify(newLevel));
-    }
 
-  let props = {...this.getProps(type), level : newLevelObj, key :newLevel}
-  
+  let props = {...this.getProps(type), level : newLevelObj, key :newLevel + type}
     // let newLevelComponent = <SingleTouch key = {newLevel} type = {type} unmount = {this.unMountScene} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
 
     let newLevelComponent = <SingleTouch {...props}/>;

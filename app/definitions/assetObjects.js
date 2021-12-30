@@ -7,11 +7,16 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const imageOffset = 30;
 const WinImageObject = (props) => {
-    return	<Image style ={{position: "absolute",left: props.endX - imageOffset/2,
-		 top: props.endY - imageOffset/2 + 5, width: props.padding + imageOffset,height:props.padding + imageOffset, 
-		borderWidth: 0, justifyContent: "center", alignItems: "center", zIndex: 10}}
+  //   return	<Image style ={{position: "absolute",left: props.endX - imageOffset/2,
+	// 	 top: props.endY - imageOffset/2 + 5, width: props.padding + imageOffset,height:props.padding + imageOffset, 
+	// 	borderWidth: 0, justifyContent: "center", alignItems: "center", zIndex: 10}}
 	
-	source={require("../../assets/StarPicture.png")}/>
+	// source={require("../../assets/StarPicture.png")}/>
+  return <View style = {{position: "absolute",left: props.endX - props.startWidth/4, backgroundColor: "#0000cc", borderRadius: props.padding/2 + props.padding,
+		 top: props.endY - imageOffset/2 + 5
+     ,height: props.paddingWithOverlap + props.padding  ,
+		width: props.paddingWithOverlap + props.padding,
+		borderWidth: 0, justifyContent: "center", alignItems: "center", zIndex: 10}}></View>
 
     
 }
