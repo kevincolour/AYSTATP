@@ -25,7 +25,7 @@ export default class CloseButton extends Component {
         onPress={this.onPress}
       >
         <Animatable.Image
-        style= {{width:30,height:30,color:"red"}}
+        style= {{width:30,height:30}}
           ref={"close"}
           delay={1500}
           animation={"bounceIn"}

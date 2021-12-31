@@ -89,7 +89,7 @@ export default class TableOfContents extends Component {
     return (
       <LinearGradient
         start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
-        colors = {[rgbToHex(217, 125 , 217), rgbToHex(100, 217, 225)]}
+        colors = {[rgbToHex(217, 175 , 217), rgbToHex(151, 217, 225)]}
         style={css.linearGradient}
       >
 
@@ -116,9 +116,10 @@ export default class TableOfContents extends Component {
               />
 
             </View>
-
+            {(this.state.custom && <Text>test22</Text>)}
             {this.state.items.map((x, i) => {
-              return (
+
+              return(
                 <Item
                   key={x.heading}
                   ref={x.heading}
@@ -127,7 +128,8 @@ export default class TableOfContents extends Component {
                   delay={++i * 75}
                   onPress={_ => this.onItemPress(x)}
                 />
-              );
+               
+              )
             })}
 
           </ScrollView>

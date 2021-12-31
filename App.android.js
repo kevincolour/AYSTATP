@@ -9,6 +9,8 @@ import {levels} from "./app/definitions/tetrisLevels";
 import {squareLevels} from "./app/definitions/squareLevels";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import LevelSelect, {Victory} from "./app/touch-events";
+import { LinearGradient } from "expo-linear-gradient";
+
 
 EStyleSheet.build();
 
@@ -205,8 +207,9 @@ export default class App extends Component {
               LevelSelect(this.mountScene,this.getProps)
               ,
               {
+                custom : true,
                 heading: "Help",
-                // onPress: _ => this.mountScene(<SingleTouch />)
+                onPress: _ => this.mountScene(<Help />)
               },
               {
                 heading: "Reset",
@@ -231,4 +234,30 @@ export default class App extends Component {
   }
 }
 
+
+const Help = () =>{
+  return (
+  
+    <LinearGradient
+    start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
+    colors = {["#D9AFD9", "#97D9E1"]}
+    style={{flex:1}}
+  >
+  	<View style ={{flex:1,justifyContent:"center",alignitems:"center"}}>
+
+    <View >
+      
+  <Text style={{fontSize:18, textAlign: 'center'}} >Are you smarter than a tetris piece?</Text>
+  
+	<Text style={{fontSize : 16 , margin:20, textAlign: 'center'}}>Move the line to the other side! There is a right way to draw the path, 
+  and the wrong way. Find the rule by trying different paths and prove you can best a tetris piece in combat</Text>
+    
+    <Text style={{fontSize : 16, margin : 20, textAlign: 'center'}}>
+      I recommend trying the "square" series of puzzles first!
+    </Text>
+    </View>
+
+		</View>
+  </LinearGradient>
+)}
 
