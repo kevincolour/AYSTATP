@@ -1,5 +1,5 @@
 const levelPrologue = {
-    name: "level0Square",
+    name: "levelPrologueSquare",
     rows : 2,
     columns : 1,
     startLocation : [0,1],

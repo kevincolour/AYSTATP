@@ -108,10 +108,11 @@ const NextImageObject = (props, type) => {
 }
 const PreviousImageObject = (props) => {
 
+  if (props.level.name.toLowerCase().indexOf("prologue") > -1){
+    return <View></View>;
+  }
+
     const image= useRef();
-    const buttonPressed = () =>{
-        console.log("here");
-    }
 
     return ( 
       <View style = {{...buttonStyle(props), left: 0}}>

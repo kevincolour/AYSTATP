@@ -82,7 +82,6 @@ export default class App extends Component {
 
   nextLevelLoad = async (increment, type) =>{
 
-    console.log(type);
     let newLevel = null;
     let newLevelObj = null;
     if (type == "square"){
@@ -99,7 +98,6 @@ export default class App extends Component {
         this.setState({currentSquareLevelIndex : newLevel})
     }
     else if (type == "tetris"){
-      console.log(this.state.currentLevelIndex);
       newLevel = this.state.currentLevelIndex + increment;
       newLevelObj = levels[newLevel];
 
@@ -137,8 +135,6 @@ export default class App extends Component {
       triggerVictory : this.triggerVictory,
       type : "tetris"
     }
-    console.log("LEVEL PROPS")
-    console.log(levelProps);
 
     if (type == "square"){
       levelProps.key = this.state.currentSquareLevelIndex + "_" + type;

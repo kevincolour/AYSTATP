@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import * as Animatable from "react-native-animatable";
 import EStyleSheet from "react-native-extended-stylesheet";
-import Close from "./images/close.png";
 
 export default class CloseButton extends Component {
   constructor(props) {
@@ -26,10 +25,11 @@ export default class CloseButton extends Component {
         onPress={this.onPress}
       >
         <Animatable.Image
+        style= {{width:30,height:30,color:"red"}}
           ref={"close"}
           delay={1500}
           animation={"bounceIn"}
-          source={Close}
+          source={require("../../assets/times-circle-regular.png")}
         />
       </TouchableOpacity>
     );

@@ -7,10 +7,12 @@ const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 // const BODY_DIAMETER = Math.trunc(Math.max(WIDTH, HEIGHT) * 0.025);
 const BODY_DIAMETER = 20;
-const BORDER_WIDTH = Math.trunc(BODY_DIAMETER * 0.1);
+const BORDER_WIDTH = Math.trunc(BODY_DIAMETER * 0.2);
 const COLORS = ["#86E9BE", "#8DE986", "#B8E986", "#E9E986"];
 const BORDER_COLORS = ["#C0F3DD", "#C4F6C0", "#E5FCCD", "#FCFDC1"];
 
+
+const pathColour = "#0A74D1"
 
 export default class PuzzlePanel extends Component {
 
@@ -83,7 +85,7 @@ export default class PuzzlePanel extends Component {
 
 
 				let pathStyle = {
-					position: "absolute", left: path[0] - overlap, top: path[1] -overlap, backgroundColor: "blue", zIndex: -1, 
+					position: "absolute", left: path[0] - overlap, top: path[1] -overlap, backgroundColor: pathColour, zIndex: 1, 
 				}
 
 			
@@ -118,8 +120,8 @@ export default class PuzzlePanel extends Component {
 		
 		let lastSeenY = this.props.movement[this.props.movement.length- 1][1];
 		let lastSeenX = this.props.movement[this.props.movement.length-1][0];
-		let pathStyle = {
-			position: "absolute", left: closestX - overlap, top: lastSeenY, width: paddingWithOverlap, backgroundColor: "blue", zIndex: -1, 
+		let pathStyle = { borderRadius : 20,
+			position: "absolute", left: closestX - overlap, top: lastSeenY, width: paddingWithOverlap, backgroundColor: pathColour, zIndex: 1, 
 		}
 		//populate line so far
 		//going up
@@ -237,51 +239,7 @@ export default class PuzzlePanel extends Component {
 		</View>
 		  {/* <View style = {{position: "absolute", left: lastKnownX, top: lastKnownY, width:200, height:200, backgroundColor: "blue" }}></View> */}
 			<View>
-			<StaggeredMotion
-					defaultStyles={[
-						{ left: this.props.x, top: this.props.y },
-						{ left: this.props.x, top: this.props.y },
-						{ left: this.props.x, top: this.props.y },
-						{ left: this.props.x, top: this.props.y }
-					]}
-					styles={prevInterpolatedStyles =>
-						prevInterpolatedStyles.map((_, i) => {
-							return i === 0
-								? {
-										left: spring(this.props.x),
-										top: spring(this.props.y)
-									}
-								: {
-										left: spring(
-											prevInterpolatedStyles[i - 1].left
-										),
-										top: spring(
-											prevInterpolatedStyles[i - 1].top
-										)
-									};
-						})}
-				>
-					{interpolatingStyles => (
-						<View style={css.anchor}>
-							{interpolatingStyles.map((style, i) => (
-								<View
-									key={i}
-									style={[
-										css.body,
-										{
-											left: style.left,
-											top: style.top,
-											backgroundColor: COLORS[i],
-											width: BODY_DIAMETER - i * 5,
-											height: BODY_DIAMETER - i * 5
-										}
-									]}
-								/>
-							))}
-						</View>
-					)}
-				</StaggeredMotion>
-				<View style={[css.head, { left: this.props.x, top: this.props.y }]} />
+				{/* <View style={[css.head, { left: this.props.x, top: this.props.y }]} /> */}
 				{/* <View style={[css.lead, { left: closestX, top: closestY}]} /> */}
 				
 			</View>
@@ -327,9 +285,9 @@ const css = StyleSheet.create({
 		position: "absolute"
 	},
 	head: {
-		backgroundColor: "#FF5877",
-		borderColor: "#FFC1C1",
-		borderWidth: BORDER_WIDTH,
+		backgroundColor: pathColour ,
+		borderColor: "#0000cc",
+		borderWidth: BORDER_WIDTH ,
 		width: BODY_DIAMETER,
 		height: BODY_DIAMETER,
 		position: "absolute",

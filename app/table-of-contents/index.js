@@ -16,6 +16,7 @@ import BackButton from "./backButton";
 import Item from "./item";
 import { LinearGradient } from "expo-linear-gradient";
 import Logo from "./images/logo.png"
+import {rgbToHex} from "../definitions/helper"
 
 export default class TableOfContents extends Component {
   constructor(props) {
@@ -87,7 +88,8 @@ export default class TableOfContents extends Component {
 
     return (
       <LinearGradient
-        colors={["#E96443", "#904E95"]}
+        start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
+        colors = {[rgbToHex(217, 125 , 217), rgbToHex(100, 217, 225)]}
         style={css.linearGradient}
       >
 

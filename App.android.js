@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Modal } from "react-native";
+import { View, Modal,Text,Alert } from "react-native";
 import CloseButton from "./app/table-of-contents/closeButton";
 import EStyleSheet from "react-native-extended-stylesheet";
 
@@ -8,9 +8,10 @@ import SingleTouch from "./app/touch-events/single-touch";
 import {levels} from "./app/definitions/tetrisLevels";
 import {squareLevels} from "./app/definitions/squareLevels";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import LevelSelect from "./app/touch-events";
+import LevelSelect, {Victory} from "./app/touch-events";
 
 EStyleSheet.build();
+
 
 
 //-- There is a bunch of warnings about the use of deprecated lifecycle methods. A lot of them are caused
@@ -36,18 +37,18 @@ export default class App extends Component {
         }
       }
       const maxLevelSquare = parseInt(await AsyncStorage.getItem('@levelMax_square'));
-      // if (maxLevelSquare){
+      if (maxLevelSquare){
         
-      //   if (maxLevelSquare <= squareLevels.length - 1){
-      //     this.setState({maxValueSquare : maxLevelSquare ,currentSquareLevelIndex :maxLevelSquare})
-      //   }
-      //   else{
-      //     await AsyncStorage.removeItem('@levelMax_square');
-      //   }
-      // }
+        if (maxLevelSquare <= squareLevels.length - 1){
+          this.setState({maxValueSquare : maxLevelSquare ,currentSquareLevelIndex :maxLevelSquare})
+        }
+        else{
+          // await AsyncStorage.removeItem('@levelMax_square');
+        }
+      }
+
     }
     finally{
-
     }
   }
   constructor(props) {
@@ -55,7 +56,7 @@ export default class App extends Component {
     super(props);
     this.state = {
       currentLevelIndex: 0,
-      currentSquareLevelIndex : 0,
+      currentSquareLevelIndex : 15,
       sceneVisible: false,
       scene: null,
       maxValue : 0,
@@ -82,7 +83,6 @@ export default class App extends Component {
 
   nextLevelLoad = async (increment, type) =>{
 
-    console.log(type);
     let newLevel = null;
     let newLevelObj = null;
     if (type == "square"){
@@ -99,7 +99,6 @@ export default class App extends Component {
         this.setState({currentSquareLevelIndex : newLevel})
     }
     else if (type == "tetris"){
-      console.log(this.state.currentLevelIndex);
       newLevel = this.state.currentLevelIndex + increment;
       newLevelObj = levels[newLevel];
 
@@ -121,12 +120,23 @@ export default class App extends Component {
   let props = {...this.getProps(type), level : newLevelObj, key :newLevel + type}
     // let newLevelComponent = <SingleTouch key = {newLevel} type = {type} unmount = {this.unMountScene} loadNext = {this.nextLevelLoad} level = {levels[newLevel]} triggerVictory = {this.triggerVictory}/>;
 
-    let newLevelComponent = <SingleTouch {...props}/>;
+    let newLevelComponent = props.level ? <SingleTouch {...props}/> : <Victory {...props}></Victory>;
     this.setState({
       sceneVisible:true,
       scene: newLevelComponent,
     })
 
+  }
+
+   resetLevels = async(type) => {
+    await AsyncStorage.removeItem('@levelMax_'+type); 
+
+    if (type == "square"){
+      this.setState({currentSquareLevelIndex : 0})
+    }
+    else if (type == "tetris"){
+      this.setState({currentLevelIndex : 0})
+    }
   }
   getProps = (type) => {
     const levelProps = {
@@ -135,18 +145,48 @@ export default class App extends Component {
       loadNext : this.nextLevelLoad,
       level : levels[this.state.currentLevelIndex],
       triggerVictory : this.triggerVictory,
+      resetLevels : this.resetLevels,
       type : "tetris"
     }
-    console.log("LEVEL PROPS")
-    console.log(levelProps);
-
+    if (this.state.currentLevelIndex < levels.length){
+      levelProps.level =  levels[this.state.currentLevelIndex]
+      levelProps.levelPercentage = this.state.currentLevelIndex / levels.length;
+    }
     if (type == "square"){
       levelProps.key = this.state.currentSquareLevelIndex + "_" + type;
       levelProps.type = "square";
-      levelProps.level =  squareLevels[this.state.currentSquareLevelIndex]
+      if (this.state.currentSquareLevelIndex < squareLevels.length){
+        levelProps.level =  squareLevels[this.state.currentSquareLevelIndex]
+        levelProps.levelPercentage = this.state.currentSquareLevelIndex / squareLevels.length;
+      }
+      else{
+        levelProps.level = null;
+      }
     }
     return levelProps;
   }
+
+  createResetAlert = async () =>
+    Alert.alert(
+      "Reset Data?",
+      "Cannot be reversed, will reset everything back to original conditions",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel Pressed"),
+          style: "cancel"
+        },
+        { text: "OK", onPress: () => 
+        
+        { 
+        AsyncStorage.clear();
+        this.setState({currentSquareLevelIndex : 0,
+          currentLevelIndex: 0
+        })
+      }
+      }
+      ]
+    );
   // triggerVictory = () =>{
   //   this.setState({
   //     victory: true
@@ -165,12 +205,12 @@ export default class App extends Component {
               LevelSelect(this.mountScene,this.getProps)
               ,
               {
-                heading: "Levels",
+                heading: "Help",
                 // onPress: _ => this.mountScene(<SingleTouch />)
               },
               {
-                heading: "Help",
-                // onPress: _ => this.mountScene(<SingleTouch />)
+                heading: "Reset",
+                 onPress: _ => this.createResetAlert()
               },
               
             ]
@@ -190,3 +230,5 @@ export default class App extends Component {
     );
   }
 }
+
+

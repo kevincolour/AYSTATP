@@ -9,17 +9,19 @@ import { Audio } from 'expo-av';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { join } from "lodash";
 
+import{rgbToHex} from "../../definitions/helper"
 // import Sound from 'react-native-sound';
+
+
 
 const { width: WIDTH, height: HEIGHT } = Dimensions.get("window");
 
 const checkAll = true;
-const debug = true;
+const debug = false;
 
 const storeData = async (key,value, type) => {
   try {
     if (value){
-      console.log('@level_' + type + "_" + key);
       await AsyncStorage.setItem('@level_' + type + "_" + key, JSON.stringify(value));
 
     }
@@ -31,11 +33,9 @@ const storeData = async (key,value, type) => {
 
 const getData = async (key,type) => {
   try {
-    console.log('@level_' + type + "_" + key);
 
     const jsonValue = await AsyncStorage.getItem('@level_' + type + "_" + key)
-    return null;
-    // return jsonValue != null ? JSON.parse(jsonValue) : null;
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
   } catch(e) {
     console.log("getDataError" , e)
     // error reading value
@@ -133,7 +133,7 @@ export default class SingleTouch extends Component {
     let offset = 20;
     let bool = (lower + offset < value && value < upper -offset) || (upper +offset < value && value < lower - offset); 
     if (bool){
-      console.log(lower, value, upper)
+      // console.log(lower, value, upper)
     }
     return bool;
   }
@@ -144,7 +144,9 @@ export default class SingleTouch extends Component {
     // console.log("update")
     if (move) {
 
-      
+      if(this.state.success || this.state.failure){
+        return; 
+      }
       const slack = 15;
 
       const moveXCap = (Math.abs(move.delta.pageX));
@@ -233,7 +235,7 @@ export default class SingleTouch extends Component {
   trackMovement = (val) => {
 
     
-    console.log(val[0],val[1]);
+    // console.log(val[0],val[1]);
     //val is an intersection, can't touch intersection more than once
     let previousX = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][0];
 		let previousY = this.state.movement.length <= 1 ? Number.MIN_SAFE_INTEGER : this.state.movement[this.state.movement.length - 2][1];
@@ -284,6 +286,7 @@ export default class SingleTouch extends Component {
 
     if (!invalidMovement && val[0] == this.state.endX && val[1] == this.state.endY){
       this.state.movement.push(val);
+      this.setState({x:this.state.endX, y:this.state.endY})
       this.evaluateRoute();
      
       return;
@@ -305,7 +308,7 @@ export default class SingleTouch extends Component {
     //check if player is travelling to a path already travelled
    if(invalidMovement){
       console.log("INVALID MOVMEENT")
-      console.log(currentLocation[0],currentLocation[1])
+      // console.log(currentLocation[0],currentLocation[1])
           this.setState ({
             x: currentLocation[0],
             y: currentLocation[1],
@@ -327,7 +330,7 @@ export default class SingleTouch extends Component {
           this.state.movement.push(val);
 
     }
-    console.log(JSON.stringify(this.state.movement));
+    // console.log(JSON.stringify(this.state.movement));
 
   }
 
@@ -933,8 +936,8 @@ borderCondition = borderCondition ||
     else{
       console.log("CHECK NEXT BLOCK FOR SQUARE DIRECTION : ", direction)
       let next = [nextX,nextY];
-      console.log("VISITED")
-      console.log(JSON.stringify(visited));
+      // console.log("VISITED")
+      // console.log(JSON.stringify(visited));
       this.checkAllDirectionsSquare(next,visited,coloursDict)
     }; 
  }
@@ -1037,15 +1040,28 @@ createGrid(state){
     </View>
   )
 }
-  render() {
- 
+
+
+render() {
+  // if (this.state.failure){
+  //   this.clearMovement();
+  // }
+
     return (
     <ErrorBoundary FallbackComponent={this.ErrorFallback} onReset = {() => this.props.unmount()}>
 
       { <GameLoop style={styles.container} onUpdate={this.onUpdate}>
         <StatusBar hidden={true} />
+
+
+        <LinearGradient
+        start={{x: 0, y: 0}} end={{x: 1, y: 0}} 
+        // colors={[this.rgbToHex(255,255,255), this.rgbToHex(255,255,255)]}
+        colors={[rgbToHex(217, 175 - Math.floor((175 * this.props.levelPercentage)), 217), rgbToHex(151 - Math.floor((151 * this.props.levelPercentage)), 217, 225)]}
+        style={{flex:1,zIndex : -100}}
+      >
       <View style = {{position:"absolute", top: this.state.heightTop, width: this.state.fullWidth + this.state.padding,
-       height: this.state.fullHeight + this.state.padding, backgroundColor:"silver",zIndex:-1}}>
+       height: this.state.fullHeight + this.state.padding, backgroundColor:"silver",zIndex:0, shadowColor: "black"}}>
       </View>
 
         <PuzzlePanel key={this.props.level.name} 
@@ -1056,9 +1072,9 @@ createGrid(state){
         evaluateRoute = {this.evaluateRoute}
         onFailedPath = {this.onFailedPath}
         trackMovementFunc={this.trackMovement}/>
+     </LinearGradient>
       </GameLoop>}
     </ErrorBoundary>
-     
     );
   }
 }

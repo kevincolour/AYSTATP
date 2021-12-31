@@ -10,7 +10,7 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "primaryColor": "#E96443",
+    "primaryColor": "#97D9E1",
     "icon": "./assets/iconPlaceholder2.png",
     "splash": {
       "image": "./assets/splashPlaceholder2.png",
